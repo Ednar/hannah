@@ -39,4 +39,21 @@ public class BashShellPrinter {
         StringBuilder stdout = commandExecutor.getStandardOutputFromCommand();
         System.out.println(stdout);
     }
+
+    public static void clear() {
+        List<String> commands = new ArrayList<>();
+        commands.add("/bin/sh");
+        commands.add("-c");
+        commands.add("clear");
+
+        SystemCommandExecutor commandExecutor = new SystemCommandExecutor(commands);
+        try {
+            commandExecutor.executeCommand();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        StringBuilder stdout = commandExecutor.getStandardOutputFromCommand();
+        System.out.println(stdout);
+    }
 }

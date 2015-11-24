@@ -56,9 +56,8 @@ public class CoffeeMachineAgent extends Agent {
         public void action() {
             printState(this);
 
-            MessageTemplate template = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
-            ACLMessage requestMessage = myAgent.blockingReceive(template);
-
+            ACLMessage requestMessage = myAgent.blockingReceive();
+            coffeeBuyer = requestMessage.getSender();
             System.out.println("Tog emot en request. Sätter mig till ON!");
 
             ACLMessage reply = requestMessage.createReply();
@@ -70,6 +69,7 @@ public class CoffeeMachineAgent extends Agent {
                 e.printStackTrace();
             }
             send(reply);
+            System.out.println("*** skickar AGREE med " + reply.getPerformative());
         }
 
         @Override
@@ -78,7 +78,7 @@ public class CoffeeMachineAgent extends Agent {
         }
     }
 
-    private class OnState extends OneShotBehaviour {
+    private class OnState extends Behaviour {
 
         @Override
         public void action() {
@@ -86,11 +86,23 @@ public class CoffeeMachineAgent extends Agent {
 
             System.out.println("Startar maskin....");
             try {
-                TimeUnit.SECONDS.sleep(3);
+                TimeUnit.SECONDS.sleep(2);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             System.out.println("Maskin startad!");
+
+            // Meddelar att maskinen är redo...
+            ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
+            request.addReceiver(coffeeBuyer);
+            request.setSender(myAgent.getAID());
+            myAgent.send(request);
+            System.out.println("*** SKICKAR request till " + coffeeBuyer.getLocalName() + "... dags att göra espresso!");
+        }
+
+        @Override
+        public boolean done() {
+            return true;
         }
     }
 
@@ -100,15 +112,8 @@ public class CoffeeMachineAgent extends Agent {
         public void action() {
             printState(this);
 
-            // Meddelar att maskinen är redo...
-            ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
-            request.addReceiver(coffeeBuyer);
-            request.setSender(myAgent.getAID());
-            myAgent.send(request);
-
             template = MessageTemplate.MatchPerformative(ACLMessage.AGREE);
-            ACLMessage agreeMessage = myAgent.receive(template);
-            System.out.println(agreeMessage);
+            ACLMessage agreeMessage = myAgent.blockingReceive(template);
             if (agreeMessage != null) {
                 System.out.println("Tog emot en agree. Dags att göra kaffe!!");
             } else {

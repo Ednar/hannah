@@ -2,7 +2,6 @@ package coffeeMachine.customerAgent;
 
 import coffeeMachine.customerAgent.behaviour.CoffeeMakingHandler;
 import jade.core.Agent;
-import jade.core.behaviours.TickerBehaviour;
 
 public class CustomerAgent extends Agent {
 
@@ -18,13 +17,7 @@ public class CustomerAgent extends Agent {
             sellerAgent = String.valueOf(arguments[0]);
             agentName = getAID().getLocalName();
 
-
-            addBehaviour(new TickerBehaviour(this, 10_000) {
-                @Override
-                protected void onTick() {
-                    addBehaviour(new CoffeeMakingHandler(sellerAgent));
-                }
-            });
+            addBehaviour(new CoffeeMakingHandler(sellerAgent));
         }
     }
 
