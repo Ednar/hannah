@@ -6,26 +6,23 @@ import jade.core.behaviours.TickerBehaviour;
 
 public class CustomerAgent extends Agent {
 
-    private String desiredCoffee;
     private String agentName;
     private String sellerAgent;
 
     @Override
     protected void setup() {
         Object[] arguments = getArguments();
-        if (arguments == null || arguments.length != 2) {
+        if (arguments == null || arguments.length != 1) {
             doDelete();
         } else {
-            desiredCoffee = String.valueOf(arguments[0]);
-            sellerAgent = String.valueOf(arguments[1]);
+            sellerAgent = String.valueOf(arguments[0]);
             agentName = getAID().getLocalName();
-            System.out.println(agentName + " wants to buy " + desiredCoffee);
 
 
-            addBehaviour(new TickerBehaviour(this, 5_000) {
+            addBehaviour(new TickerBehaviour(this, 10_000) {
                 @Override
                 protected void onTick() {
-                    addBehaviour(new CoffeeMakingHandler(desiredCoffee, sellerAgent));
+                    addBehaviour(new CoffeeMakingHandler(sellerAgent));
                 }
             });
         }
