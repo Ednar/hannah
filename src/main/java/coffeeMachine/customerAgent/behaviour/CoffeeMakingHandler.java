@@ -12,7 +12,6 @@ public class CoffeeMakingHandler extends Behaviour {
     private AID machine;
 
 
-
     public CoffeeMakingHandler(final String coffeeMachine) {
         this.coffeeMachine = coffeeMachine;
         machine = new AID(this.coffeeMachine, AID.ISLOCALNAME);
@@ -24,10 +23,13 @@ public class CoffeeMakingHandler extends Behaviour {
         switch (StoryBoard.step) {
             case TURN_ON:
 
-            //    StoryTellingUtils.dramaticPause();
-           //     BashShellPrinter.clear();
-                StoryBoard.setBuyer(myAgent);
-                StoryBoard.turnOnCoffee();
+                //    StoryTellingUtils.dramaticPause();
+                //    BashShellPrinter.clear();
+                //    StoryBoard.setBuyer(myAgent);
+                //    StoryBoard.turnOnCoffee();
+
+                 sendMessage(ACLMessage.REQUEST);
+                StoryBoard.step = StoryBoard.Step.WAIT_FOR_TURN_ON_ACCEPT;
                 break;
             case WAIT_FOR_TURN_ON_ACCEPT:
                 System.out.println("CASE: WAIT_FOR_TURN_ON_ACCEPT");
@@ -51,7 +53,7 @@ public class CoffeeMakingHandler extends Behaviour {
                 }
 
 
-               // receiveMessage(ACLMessage.REQUEST, Step.TURNING_ESPRESSO_KNOB, "Tog emot en request. Väntar på att Dave ska be mig trycka på espresso-knappen");
+                // receiveMessage(ACLMessage.REQUEST, Step.TURNING_ESPRESSO_KNOB, "Tog emot en request. Väntar på att Dave ska be mig trycka på espresso-knappen");
                 break;
             case TURNING_ESPRESSO_KNOB:
                 System.out.println("CASE: TURNING_ESPRESSO_KNOB");

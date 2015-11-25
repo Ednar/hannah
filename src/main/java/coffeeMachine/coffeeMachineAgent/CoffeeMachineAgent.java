@@ -20,6 +20,7 @@ public class CoffeeMachineAgent extends Agent {
     private static final int TURN_ON = 1;
     private static final int TURN_OFF = 0;
     private static final String HEAT_AND_PRESSURE_READY = "HEAT AND PRESSURE READY";
+    private static final String STEAMER_READY = "STEAMER READY";
     private MessageTemplate template;
     private AID coffeeBuyer;
 
@@ -34,18 +35,20 @@ public class CoffeeMachineAgent extends Agent {
             }
         };
 
-
         fsm.registerFirstState(new OffState(), OFF);
         fsm.registerState(new OnState(), ON);
         fsm.registerState(new HeatAndPressureReadyState(), HEAT_AND_PRESSURE_READY);
+        fsm.registerState(new SteamerReadyState(), STEAMER_READY);
 
         // Av till på vid på command
         fsm.registerTransition(OFF, ON, TURN_ON);
         // Av till av utan command
         fsm.registerTransition(OFF, OFF, TURN_OFF);
 
-
+        // Går automatiskt från ON till att värme och tryck är klart
         fsm.registerDefaultTransition(ON, HEAT_AND_PRESSURE_READY);
+        // Efter att espresso är bryggt går den automatiskt till att mjölk-saken är redo
+        fsm.registerDefaultTransition(HEAT_AND_PRESSURE_READY, STEAMER_READY);
 
         addBehaviour(fsm);
     }
@@ -134,5 +137,30 @@ public class CoffeeMachineAgent extends Agent {
 
     private void printState(Behaviour behaviour) {
         System.out.println("*** Entering state: " + behaviour.getBehaviourName() + " ***");
+    }
+
+    private class SteamerReadyState extends Behaviour {
+
+        @Override
+        public void action() {
+            ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
+            request.addReceiver(coffeeBuyer);
+            request.setSender(myAgent.getAID());
+            myAgent.send(request);
+            System.out.println("*** SKICKAR request till " + coffeeBuyer.getLocalName() + "... dags att hetta upp mjölk!");
+
+            template = MessageTemplate.MatchPerformative(ACLMessage.AGREE);
+            ACLMessage agreeMessage = myAgent.blockingReceive(template);
+            if (agreeMessage != null) {
+                System.out.println("Tog emot en agree.Mjölk klar!!");
+            } else {
+                block();
+            }
+        }
+
+        @Override
+        public boolean done() {
+            return false;
+        }
     }
 }
