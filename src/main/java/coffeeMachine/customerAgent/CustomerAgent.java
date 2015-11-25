@@ -1,6 +1,7 @@
 package coffeeMachine.customerAgent;
 
-import coffeeMachine.customerAgent.behaviour.CoffeeMakingHandler;
+import coffeeMachine.customerAgent.behaviour.StoryBoardBehaviour;
+import coffeeMachine.customerAgent.behaviour.StoryTellingBehaviour;
 import jade.core.Agent;
 
 public class CustomerAgent extends Agent {
@@ -17,12 +18,15 @@ public class CustomerAgent extends Agent {
             sellerAgent = String.valueOf(arguments[0]);
             agentName = getAID().getLocalName();
 
-            addBehaviour(new CoffeeMakingHandler(sellerAgent));
+            StoryBoardBehaviour storyBoard = new StoryBoardBehaviour(sellerAgent);
+            addBehaviour(storyBoard);
+            addBehaviour(new StoryTellingBehaviour(storyBoard));
         }
     }
 
     @Override
     protected void takeDown() {
+        System.out.println();
         System.out.println(agentName + " is terminating");
     }
 }

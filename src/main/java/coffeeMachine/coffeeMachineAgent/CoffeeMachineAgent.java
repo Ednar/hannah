@@ -50,6 +50,8 @@ public class CoffeeMachineAgent extends Agent {
         // Efter att espresso är bryggt går den automatiskt till att mjölk-saken är redo
         fsm.registerDefaultTransition(HEAT_AND_PRESSURE_READY, STEAMER_READY);
 
+        fsm.registerDefaultTransition(STEAMER_READY, OFF);
+
         addBehaviour(fsm);
     }
 
@@ -58,21 +60,10 @@ public class CoffeeMachineAgent extends Agent {
         @Override
         public void action() {
             printState(this);
-
-            ACLMessage requestMessage = myAgent.blockingReceive();
-            coffeeBuyer = requestMessage.getSender();
-            System.out.println("Tog emot en request. Sätter mig till ON!");
-
-            ACLMessage reply = requestMessage.createReply();
-            reply.setPerformative(ACLMessage.AGREE);
-
-            try {
-                TimeUnit.SECONDS.sleep(1);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            send(reply);
-            System.out.println("*** skickar AGREE med " + reply.getPerformative());
+            receiveMessage(ACLMessage.REQUEST, "Tog emot request. Sätter mig till on");
+            sendMessage(ACLMessage.AGREE);
+            pauseFor(1);
+            System.out.println("Maskin sätter sig till ON");
         }
 
         @Override
@@ -81,86 +72,80 @@ public class CoffeeMachineAgent extends Agent {
         }
     }
 
-    private class OnState extends Behaviour {
+    private class OnState extends OneShotBehaviour {
 
         @Override
         public void action() {
             printState(this);
 
             System.out.println("Startar maskin....");
-            try {
-                TimeUnit.SECONDS.sleep(2);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            pauseFor(2);
             System.out.println("Maskin startad!");
 
-            // Meddelar att maskinen är redo...
-            ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
-            request.addReceiver(coffeeBuyer);
-            request.setSender(myAgent.getAID());
-            myAgent.send(request);
+            sendMessage(ACLMessage.REQUEST);
             System.out.println("*** SKICKAR request till " + coffeeBuyer.getLocalName() + "... dags att göra espresso!");
         }
 
-        @Override
-        public boolean done() {
-            return true;
-        }
     }
 
-    private class HeatAndPressureReadyState extends Behaviour {
+    private class HeatAndPressureReadyState extends OneShotBehaviour {
 
         @Override
         public void action() {
             printState(this);
 
-            template = MessageTemplate.MatchPerformative(ACLMessage.AGREE);
-            ACLMessage agreeMessage = myAgent.blockingReceive(template);
-            if (agreeMessage != null) {
-                System.out.println("Tog emot en agree. Dags att göra kaffe!!");
-            } else {
-                block();
-            }
+            receiveMessage(ACLMessage.AGREE, "Tog emot en agree. Dags att göra kaffe!");
         }
+    }
+
+
+    private class SteamerReadyState extends OneShotBehaviour {
 
         @Override
-        public int onEnd() {
-            return super.onEnd();
-        }
+        public void action() {
+            System.out.println("Heating steamer....");
+            pauseFor(2);
+            System.out.println("Steamer ready");
 
-        @Override
-        public boolean done() {
-            return false;
+
+            sendMessage(ACLMessage.REQUEST);
+            System.out.println("*** skickar request till " + coffeeBuyer.getLocalName() + "... dags att hetta upp mjölk!");
+
+            pauseFor(1);
+            receiveMessage(ACLMessage.AGREE, "Tog emot en agree. Kaffe latte är klar! Stänger maskin");
+            pauseFor(1);
+
+            sendMessage(ACLMessage.REQUEST); // Du kan ta din kaffe nu, kompis.
+        }
+    }
+
+    @SuppressWarnings("Duplicates")
+    private void sendMessage(int performative) {
+        ACLMessage message = new ACLMessage(performative);
+        message.addReceiver(coffeeBuyer);
+        message.setSender(getAID());
+        send(message);
+        System.out.println("Skickar meddelande till " + coffeeBuyer.getLocalName() + " " + performative);
+    }
+
+    private void receiveMessage(int performative, String message) {
+        ACLMessage requestMessage = blockingReceive();
+        coffeeBuyer = requestMessage.getSender();
+        if (requestMessage.getPerformative() == performative) {
+            System.out.println("Tar emot meddelande från kaffeköpare: " + requestMessage.getPerformative());
+            System.out.println(message);
+        }
+    }
+
+    private void pauseFor(final int seconds) {
+        try {
+            TimeUnit.SECONDS.sleep(seconds);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
     private void printState(Behaviour behaviour) {
         System.out.println("*** Entering state: " + behaviour.getBehaviourName() + " ***");
-    }
-
-    private class SteamerReadyState extends Behaviour {
-
-        @Override
-        public void action() {
-            ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
-            request.addReceiver(coffeeBuyer);
-            request.setSender(myAgent.getAID());
-            myAgent.send(request);
-            System.out.println("*** SKICKAR request till " + coffeeBuyer.getLocalName() + "... dags att hetta upp mjölk!");
-
-            template = MessageTemplate.MatchPerformative(ACLMessage.AGREE);
-            ACLMessage agreeMessage = myAgent.blockingReceive(template);
-            if (agreeMessage != null) {
-                System.out.println("Tog emot en agree.Mjölk klar!!");
-            } else {
-                block();
-            }
-        }
-
-        @Override
-        public boolean done() {
-            return false;
-        }
     }
 }
