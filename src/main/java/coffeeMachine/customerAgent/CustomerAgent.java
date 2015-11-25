@@ -19,6 +19,7 @@ public class CustomerAgent extends Agent {
             agentName = getAID().getLocalName();
 
             StoryBoardBehaviour storyBoard = new StoryBoardBehaviour(sellerAgent);
+
             addBehaviour(storyBoard);
             addBehaviour(new StoryTellingBehaviour(storyBoard));
         }

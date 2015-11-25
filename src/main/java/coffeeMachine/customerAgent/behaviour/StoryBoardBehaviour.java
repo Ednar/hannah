@@ -1,17 +1,13 @@
 package coffeeMachine.customerAgent.behaviour;
 
-import coffeeMachine.story.StoryBoard;
-import coffeeMachine.story.StoryTellingUtils;
 import coffeeMachine.util.BashShellPrinter;
+import coffeeMachine.util.MusicPlayer;
 import jade.core.AID;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 
-import javax.sound.midi.InvalidMidiDataException;
-import javax.sound.midi.MidiSystem;
-import javax.sound.midi.MidiUnavailableException;
-import javax.sound.midi.Sequencer;
-import java.io.*;
+import static coffeeMachine.story.StoryTellingUtils.dramaticPause;
+import static coffeeMachine.story.StoryTellingUtils.slowWrite;
 
 public class StoryBoardBehaviour extends Behaviour {
 
@@ -23,7 +19,6 @@ public class StoryBoardBehaviour extends Behaviour {
     public enum Step {
         INITIALIZED,
         TURN_ON,
-        WAIT_FOR_TURN_ON_ACCEPT,
         WAIT_FOR_DAVE_TO_HEAT_AND_PRESSURIZE,
         TURNING_ESPRESSO_KNOB,
         TURNING_STEAM_KNOB,
@@ -35,47 +30,32 @@ public class StoryBoardBehaviour extends Behaviour {
     public StoryBoardBehaviour(final String coffeeMachine) {
         this.coffeeMachine = coffeeMachine;
         machine = new AID(this.coffeeMachine, AID.ISLOCALNAME);
-        System.out.println("CASE: INIT");
-        StoryBoard.setCoffeeMakingHandler(this);
-        StoryTellingUtils.dramaticPause();
-        StoryBoard.setBuyer(myAgent);
 
-        ((Runnable) () -> {
-            Sequencer sequencer = null;
-            try {
-                sequencer = MidiSystem.getSequencer();
-                sequencer.open();
-                InputStream is = new BufferedInputStream(new FileInputStream(new File("rain.mid")));
-                sequencer.setSequence(is);
-                sequencer.start();
-            } catch (MidiUnavailableException | IOException | InvalidMidiDataException e) {
-                // Ignored lol
-            }
-
-        }).run();
-
-
+        dramaticPause();
+        MusicPlayer.playThemeSong();
         BashShellPrinter.clear();
-
     }
 
     @Override
     public void action() {
         switch (step) {
             case INITIALIZED:
-                // Waiting for hero. Please stand by
+                // Waiting for hero to arrive at the machine. Give him/her some time.
                 break;
             case TURN_ON:
+                // Try to turn on the machine. It can either accept if the machine is free, or refuse if it's being used.
                 sendSilent(ACLMessage.REQUEST);
-                step = Step.WAIT_FOR_TURN_ON_ACCEPT;
-                break;
-            case WAIT_FOR_TURN_ON_ACCEPT:
+
                 int performative = receiveSilent();
                 if (performative == ACLMessage.AGREE)
                     step = Step.WAIT_FOR_DAVE_TO_HEAT_AND_PRESSURIZE;
+                else {
+                    doMultiplayerConflictDeath();
+                }
                 break;
             case WAIT_FOR_DAVE_TO_HEAT_AND_PRESSURIZE:
                 receiveSilent();
+                // Waiting for the hero to turn the espresso knob
                 break;
             case TURNING_ESPRESSO_KNOB:
                 sendSilent(ACLMessage.AGREE);
@@ -83,6 +63,7 @@ public class StoryBoardBehaviour extends Behaviour {
                 break;
             case TURNING_STEAM_KNOB:
                 receiveSilent();
+                // Waiting for the hero to start steaming milk
                 break;
             case SKIMMING_MILK:
                 sendSilent(ACLMessage.AGREE);
@@ -90,6 +71,7 @@ public class StoryBoardBehaviour extends Behaviour {
                 break;
             case WAIT_FOR_LATTE:
                 receiveSilent();
+                // Waiting for the hero finish the quest
                 break;
             case DONE:
                 myAgent.doDelete();
@@ -97,6 +79,14 @@ public class StoryBoardBehaviour extends Behaviour {
 
         }
 
+    }
+
+    private void doMultiplayerConflictDeath() {
+        slowWrite("You see a sad creature in front of the coffee machine, its arms and hands a blur as it\n" +
+                "feverishly turns knobs and presses buttons. For what eldritch purposes you do not know.\n");
+        dramaticPause();
+        slowWrite("Aimlessly you wander back to your desk only to perish from dehydration.");
+        myAgent.doDelete();
     }
 
     @SuppressWarnings("Duplicates")
@@ -118,6 +108,7 @@ public class StoryBoardBehaviour extends Behaviour {
 
     public void sendSilent(int performative) {
         ACLMessage message = new ACLMessage(performative);
+        message.setConversationId(myAgent.getLocalName());
         message.addReceiver(machine);
         message.setSender(myAgent.getAID());
         myAgent.send(message);

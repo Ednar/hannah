@@ -6,8 +6,8 @@ import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.FSMBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class CoffeeMachineAgent extends Agent {
@@ -21,8 +21,11 @@ public class CoffeeMachineAgent extends Agent {
     private static final int TURN_OFF = 0;
     private static final String HEAT_AND_PRESSURE_READY = "HEAT AND PRESSURE READY";
     private static final String STEAMER_READY = "STEAMER READY";
-    private MessageTemplate template;
-    private AID coffeeBuyer;
+
+    // Handling multiplayer conflicts
+    private String currentState;
+    private String ongoingConversationId;
+    private AID coffeeBuyerBeingServed;
 
     @Override
     protected void setup() {
@@ -60,6 +63,8 @@ public class CoffeeMachineAgent extends Agent {
         @Override
         public void action() {
             printState(this);
+            currentState = OFF;
+
             receiveMessage(ACLMessage.REQUEST, "Tog emot request. Sätter mig till on");
             sendMessage(ACLMessage.AGREE);
             pauseFor(1);
@@ -77,13 +82,14 @@ public class CoffeeMachineAgent extends Agent {
         @Override
         public void action() {
             printState(this);
+            currentState = ON;
 
             System.out.println("Startar maskin....");
             pauseFor(2);
             System.out.println("Maskin startad!");
 
             sendMessage(ACLMessage.REQUEST);
-            System.out.println("*** SKICKAR request till " + coffeeBuyer.getLocalName() + "... dags att göra espresso!");
+            System.out.println("*** SKICKAR request till " + coffeeBuyerBeingServed.getLocalName() + "... dags att göra espresso!");
         }
 
     }
@@ -93,6 +99,7 @@ public class CoffeeMachineAgent extends Agent {
         @Override
         public void action() {
             printState(this);
+            currentState = HEAT_AND_PRESSURE_READY;
 
             receiveMessage(ACLMessage.AGREE, "Tog emot en agree. Dags att göra kaffe!");
         }
@@ -103,13 +110,14 @@ public class CoffeeMachineAgent extends Agent {
 
         @Override
         public void action() {
+            currentState = STEAMER_READY;
             System.out.println("Heating steamer....");
             pauseFor(2);
             System.out.println("Steamer ready");
 
 
             sendMessage(ACLMessage.REQUEST);
-            System.out.println("*** skickar request till " + coffeeBuyer.getLocalName() + "... dags att hetta upp mjölk!");
+            System.out.println("*** skickar request till " + coffeeBuyerBeingServed.getLocalName() + "... dags att hetta upp mjölk!");
 
             pauseFor(1);
             receiveMessage(ACLMessage.AGREE, "Tog emot en agree. Kaffe latte är klar! Stänger maskin");
@@ -122,15 +130,27 @@ public class CoffeeMachineAgent extends Agent {
     @SuppressWarnings("Duplicates")
     private void sendMessage(int performative) {
         ACLMessage message = new ACLMessage(performative);
-        message.addReceiver(coffeeBuyer);
+        message.addReceiver(coffeeBuyerBeingServed);
         message.setSender(getAID());
         send(message);
-        System.out.println("Skickar meddelande till " + coffeeBuyer.getLocalName() + " " + performative);
+        System.out.println("Skickar meddelande till " + coffeeBuyerBeingServed.getLocalName() + " " + performative);
     }
 
     private void receiveMessage(int performative, String message) {
         ACLMessage requestMessage = blockingReceive();
-        coffeeBuyer = requestMessage.getSender();
+
+        if (currentState.equals(OFF) && requestMessage.getPerformative() == ACLMessage.REQUEST) {
+            ongoingConversationId = requestMessage.getConversationId();
+            coffeeBuyerBeingServed = requestMessage.getSender();
+            System.out.println("Sätter pågående konversation: " + ongoingConversationId);
+        }
+        if (!Objects.equals(ongoingConversationId, requestMessage.getConversationId())) {
+            System.out.println("SENDING REFUYSE ASDÖKASDKASDÖLKALSÖDKÖLASDKLÖKDÖL " + ACLMessage.REFUSE);
+            ACLMessage reply = requestMessage.createReply();
+            reply.setPerformative(ACLMessage.REFUSE);
+            send(reply);
+            return;
+        }
         if (requestMessage.getPerformative() == performative) {
             System.out.println("Tar emot meddelande från kaffeköpare: " + requestMessage.getPerformative());
             System.out.println(message);

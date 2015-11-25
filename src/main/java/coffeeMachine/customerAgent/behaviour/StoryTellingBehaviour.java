@@ -2,6 +2,7 @@ package coffeeMachine.customerAgent.behaviour;
 
 import jade.core.behaviours.Behaviour;
 
+import java.util.Random;
 import java.util.Scanner;
 
 import static coffeeMachine.story.StoryTellingUtils.*;
@@ -33,24 +34,39 @@ public class StoryTellingBehaviour extends Behaviour {
                         " \\____/\\___/|_| |_| \\___|\\___|  \\_/\\_\\\\__,_|\\___||___/\\__|\n" +
                         "                                                          \n" +
                         "*********************************************************\n" +
-                        "\n");
-                System.out.println("It's time.");
+                        "*       Navigate the office: go [direction]             *\n" +
+                        "*       Fighting the monster: press [button]            *\n" +
+                        "*********************************************************\n");
+
+                slowWrite("It's time.");
                 dramaticPause();
-                fastWrite("In the distance you can see it...");
+                fastWrite("In the distance you can barely make out the shape of a curious contraption...");
                 dramaticPause();
-                slowWrite("The coffee machine whispers to you, calling you.");
+                slowWrite("The coffee machine whispers to you, beckoning for you.");
                 System.out.print("What do you do? ");
                 choice = scanner.nextLine();
 
                 if (choiceIs("go north")) {
                     System.out.println();
-                } else if (choiseContainsGo(choice)) {
+                } else if (choiceContainsDirection(choice)) {
                     System.out.println();
                     dramaticPause();
-                    slowWrite("You enter in a forrest");
+                    slowWrite("You are now in a forrest");
                     while (true) {
                         System.out.print("What do you do? ");
                         choice = scanner.nextLine();
+                        Random random = new Random();
+                        int randomValue = random.nextInt(27) + 97;
+                        char randomLetter = (char) randomValue;
+                        if (choice.contains(randomLetter + "")) {
+                            slowWrite("You stumble and fall, breaking your ankles. \n" +
+                                    "In a clearing ahead you see movement - hope, a rescuer? \n");
+                            dramaticPause();
+                            fastWrite("No!");
+                            dramaticPause();
+                            slowWrite("Wild beast kill you and feed your remains to their young.\nYou have failed the quest.");
+                            quit();
+                        }
                         slowWrite("You go deeper into the forrest");
                     }
                 } else {
@@ -90,13 +106,9 @@ public class StoryTellingBehaviour extends Behaviour {
                 System.out.print("What do you do? ");
                 choice = scanner.nextLine();
 
-                if (choiceIs("press on")) {
-                    //      coffeeMakingHandler.sendSilent(ACLMessage.REQUEST);
+                if (choiceContains(choice, "on")) {
                     storyBoard.step = StoryBoardBehaviour.Step.TURN_ON;
                     chapter = 3;
-
-                    //      coffeeMakingHandler.receiveSilent(ACLMessage.AGREE, StoryBoard.Step.WAIT_FOR_DAVE_TO_HEAT_AND_PRESSURIZE);
-
                 } else {
                     slowWrite("Butter fingers! You fumble your hand into a wall-socket and die. Life can be like that.");
                     quit();
@@ -132,9 +144,7 @@ public class StoryTellingBehaviour extends Behaviour {
                 System.out.print("What do you do? ");
                 choice = scanner.nextLine();
 
-                if (choiceIs("press espresso")) {
-                    //        coffeeMakingHandler.receiveSilent(ACLMessage.REQUEST, StoryBoard.Step.TURNING_ESPRESSO_KNOB);
-                    //         coffeeMakingHandler.sendSilent(ACLMessage.AGREE);
+                if (choiceContains(choice, "espresso")) {
                     storyBoard.step = StoryBoardBehaviour.Step.TURNING_ESPRESSO_KNOB;
                     chapter = 4;
 
@@ -156,7 +166,7 @@ public class StoryTellingBehaviour extends Behaviour {
                 System.out.print("What do you do? ");
                 choice = scanner.nextLine();
 
-                if (choiceIs("press steam")) {
+                if (choiceContains(choice, "steam")) {
                     storyBoard.step = StoryBoardBehaviour.Step.SKIMMING_MILK;
                     chapter = 5;
                 } else {
@@ -199,7 +209,14 @@ public class StoryTellingBehaviour extends Behaviour {
 
     private boolean choiceIs(final String choice) {return this.choice.trim().equalsIgnoreCase(choice);}
 
-    private boolean choiseContainsGo(final String choice) {return this.choice.trim().contains("go") || this.choice.trim().contains("GO");}
+    private boolean choiceContainsDirection(final String choice) {return this.choice.trim().contains("go") || this.choice.trim().contains("GO");}
+
+    private boolean choiceContains(String choice, String keyword)
+    {
+        String processedChoice = choice.trim().toLowerCase();
+        String processedKeyword = keyword.trim().toLowerCase();
+        return processedChoice.contains(processedKeyword);
+    }
 
     private void quit() {System.exit(0);}
 }
