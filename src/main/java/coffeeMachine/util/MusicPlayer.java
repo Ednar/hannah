@@ -6,7 +6,15 @@ import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Sequencer;
 import java.io.*;
 
+/**
+ * Musikspelare som kör hjältens titelmelodi i en bakgrundsprocess.
+ *
+ */
 public class MusicPlayer {
+
+    /**
+     * Spelar förvald musik en bakgrundsprocess.
+     */
     public static void playThemeSong() {
         ((Runnable) () -> {
             Sequencer sequencer = null;
@@ -17,7 +25,7 @@ public class MusicPlayer {
                 sequencer.setSequence(is);
                 sequencer.start();
             } catch (MidiUnavailableException | IOException | InvalidMidiDataException e) {
-                // Ignored lol
+                // Ignored
             }
 
         }).run();

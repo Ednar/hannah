@@ -9,6 +9,13 @@ import jade.lang.acl.ACLMessage;
 import static coffeeMachine.story.StoryTellingUtils.dramaticPause;
 import static coffeeMachine.story.StoryTellingUtils.slowWrite;
 
+/**
+ * Hanterar den faktiska kommunikationen med kaffemaskinen.
+ *
+ * Konversationen sker stegvis, i en switch för att styra flödet
+ * av kaffebryggandet från början till slut.
+ *
+ */
 public class StoryBoardBehaviour extends Behaviour {
 
     private final String coffeeMachine;
@@ -16,10 +23,13 @@ public class StoryBoardBehaviour extends Behaviour {
 
     private AID machine;
 
+    /**
+     * Steg i kommunikationen
+     */
     public enum Step {
         INITIALIZED,
         TURN_ON,
-        WAIT_FOR_DAVE_TO_HEAT_AND_PRESSURIZE,
+        WAIT_FOR_MACHINE_TO_HEAT_AND_PRESSURIZE,
         TURNING_ESPRESSO_KNOB,
         TURNING_STEAM_KNOB,
         SKIMMING_MILK,
@@ -27,35 +37,38 @@ public class StoryBoardBehaviour extends Behaviour {
         DONE
     }
 
+    /**
+     * @param coffeeMachine Namnet på kaffemaskinen som används
+     */
     public StoryBoardBehaviour(final String coffeeMachine) {
         this.coffeeMachine = coffeeMachine;
         machine = new AID(this.coffeeMachine, AID.ISLOCALNAME);
 
         dramaticPause();
-        MusicPlayer.playThemeSong();
-        BashShellPrinter.clear();
+        MusicPlayer.playThemeSong(); // Spelar titelmelodi
+        BashShellPrinter.clear(); // Tömmer konsolen
     }
 
     @Override
     public void action() {
         switch (step) {
             case INITIALIZED:
-                // Waiting for hero to arrive at the machine. Give him/her some time.
+                // Väntar på att kund ska komma till maskine
                 break;
             case TURN_ON:
-                // Try to turn on the machine. It can either accept if the machine is free, or refuse if it's being used.
+                // Försöker slå på maskinen. Om maskinen redan är upptagen avslås förfrågan
                 sendSilent(ACLMessage.REQUEST);
 
                 int performative = receiveSilent();
                 if (performative == ACLMessage.AGREE)
-                    step = Step.WAIT_FOR_DAVE_TO_HEAT_AND_PRESSURIZE;
+                    step = Step.WAIT_FOR_MACHINE_TO_HEAT_AND_PRESSURIZE;
                 else {
                     doMultiplayerConflictDeath();
                 }
                 break;
-            case WAIT_FOR_DAVE_TO_HEAT_AND_PRESSURIZE:
+            case WAIT_FOR_MACHINE_TO_HEAT_AND_PRESSURIZE:
                 receiveSilent();
-                // Waiting for the hero to turn the espresso knob
+                // Väntar på att kund slår på espresso-knappen
                 break;
             case TURNING_ESPRESSO_KNOB:
                 sendSilent(ACLMessage.AGREE);
@@ -63,7 +76,7 @@ public class StoryBoardBehaviour extends Behaviour {
                 break;
             case TURNING_STEAM_KNOB:
                 receiveSilent();
-                // Waiting for the hero to start steaming milk
+                // Väntar på att kund börjar göra mjölk
                 break;
             case SKIMMING_MILK:
                 sendSilent(ACLMessage.AGREE);
@@ -71,7 +84,7 @@ public class StoryBoardBehaviour extends Behaviour {
                 break;
             case WAIT_FOR_LATTE:
                 receiveSilent();
-                // Waiting for the hero finish the quest
+                // Väntar på att kaffe ska bli klar
                 break;
             case DONE:
                 myAgent.doDelete();
@@ -81,6 +94,7 @@ public class StoryBoardBehaviour extends Behaviour {
 
     }
 
+    // Om en annan kund kommer till maskinenen när den används händer detta
     private void doMultiplayerConflictDeath() {
         slowWrite("You see a sad creature in front of the coffee machine, its arms and hands a blur as it\n" +
                 "feverishly turns knobs and presses buttons. For what eldritch purposes you do not know.\n");

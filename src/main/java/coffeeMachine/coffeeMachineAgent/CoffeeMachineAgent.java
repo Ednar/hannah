@@ -10,25 +10,37 @@ import jade.lang.acl.ACLMessage;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Kaffemaskinagent som fungerar som en FSM (Finite State Machine) med syfte
+ * att brygga kaffe latte genom att först göra en kopp espresso, sen lägga till
+ * mjölk. När processen är klar stängs maskinen av.
+ *
+ * Maskinen kan vara:
+ * På (ON)
+ * Av (OFF)
+ * Redo att göra kaffe (HEAT_AND_PRESSURE_READY)
+ * Redo att göra mjölk (STEAMER_READY)
+ */
 public class CoffeeMachineAgent extends Agent {
 
     // States
     private static final String OFF = "OFF";
     private static final String ON = "ON";
+    private static final String HEAT_AND_PRESSURE_READY = "HEAT AND PRESSURE READY";
+    private static final String STEAMER_READY = "STEAMER READY";
 
     // Commands
     private static final int TURN_ON = 1;
     private static final int TURN_OFF = 0;
-    private static final String HEAT_AND_PRESSURE_READY = "HEAT AND PRESSURE READY";
-    private static final String STEAMER_READY = "STEAMER READY";
 
-    // Handling multiplayer conflicts
+    // Hanterar multiplayerkonflikter med hjälp av konversationsid och nuvarande köpar-id.
     private String currentState;
     private String ongoingConversationId;
     private AID coffeeBuyerBeingServed;
 
     @Override
     protected void setup() {
+        // Färdigt behaviour för att underlätta implementationen av en FSM
         FSMBehaviour fsm = new FSMBehaviour(this) {
             @Override
             public int onEnd() {
@@ -38,6 +50,7 @@ public class CoffeeMachineAgent extends Agent {
             }
         };
 
+        // Maskinen startar i OFF state.
         fsm.registerFirstState(new OffState(), OFF);
         fsm.registerState(new OnState(), ON);
         fsm.registerState(new HeatAndPressureReadyState(), HEAT_AND_PRESSURE_READY);
@@ -65,7 +78,9 @@ public class CoffeeMachineAgent extends Agent {
             printState(this);
             currentState = OFF;
 
+            // En kund startar maskinen
             receiveMessage(ACLMessage.REQUEST, "Tog emot request. Sätter mig till on");
+            // Skickar en agree för att indikera att maskinen är på
             sendMessage(ACLMessage.AGREE);
             pauseFor(1);
             System.out.println("Maskin sätter sig till ON");
@@ -88,6 +103,7 @@ public class CoffeeMachineAgent extends Agent {
             pauseFor(2);
             System.out.println("Maskin startad!");
 
+            // Skickar meddelande till kund att det går bra att göra kaffe
             sendMessage(ACLMessage.REQUEST);
             System.out.println("*** SKICKAR request till " + coffeeBuyerBeingServed.getLocalName() + "... dags att göra espresso!");
         }
@@ -139,18 +155,22 @@ public class CoffeeMachineAgent extends Agent {
     private void receiveMessage(int performative, String message) {
         ACLMessage requestMessage = blockingReceive();
 
+        // Om maskinen är av och en den får en önskan om att slå på sig påbörjas en ny konversationen
         if (currentState.equals(OFF) && requestMessage.getPerformative() == ACLMessage.REQUEST) {
             ongoingConversationId = requestMessage.getConversationId();
             coffeeBuyerBeingServed = requestMessage.getSender();
             System.out.println("Sätter pågående konversation: " + ongoingConversationId);
         }
+        // Om en konversation redan pågår avslås den nya kunden
         if (!Objects.equals(ongoingConversationId, requestMessage.getConversationId())) {
-            System.out.println("SENDING REFUYSE ASDÖKASDKASDÖLKALSÖDKÖLASDKLÖKDÖL " + ACLMessage.REFUSE);
+            System.out.println("SKickar REFUSE  " + ACLMessage.REFUSE);
             ACLMessage reply = requestMessage.createReply();
             reply.setPerformative(ACLMessage.REFUSE);
             send(reply);
+            // Går ur metoden, eftersom nya konversationen avslås
             return;
         }
+        // Slutligen hanteras meddelandet som vanligt
         if (requestMessage.getPerformative() == performative) {
             System.out.println("Tar emot meddelande från kaffeköpare: " + requestMessage.getPerformative());
             System.out.println(message);

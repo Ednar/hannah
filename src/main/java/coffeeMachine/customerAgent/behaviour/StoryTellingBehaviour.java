@@ -7,6 +7,13 @@ import java.util.Scanner;
 
 import static coffeeMachine.story.StoryTellingUtils.*;
 
+/**
+ * "Hjärtat" av programmet.
+ *
+ * All interaktion med kaffemaskinen sker genom detta text-baserade rollspel.
+ * Kommunicerar med storyboard-klassen som i sin tur hanterar flödet i
+ * konversationen.
+ */
 public class StoryTellingBehaviour extends Behaviour {
 
     private Scanner scanner = new Scanner(System.in);
@@ -180,6 +187,19 @@ public class StoryTellingBehaviour extends Behaviour {
                 slowWrite("You watch as steaming, white liquid pours into the cup.");
                 dramaticPause();
                 fastWrite("Can you drink this?");
+                System.out.println();
+
+                turboWrite("" +
+                                ")))\n" +
+                                "    (((\n" +
+                                "  +-----+\n" +
+                                "  |     |]\n" +
+                                "  `-----'  n\n" +
+                                "___________\n" +
+                                "`---------'\n" +
+                        "");
+                System.out.println();
+
                 dramaticPause();
                 slowWrite("You gently take a sip from the cup.");
                 slowWrite("And another.");
@@ -211,8 +231,7 @@ public class StoryTellingBehaviour extends Behaviour {
 
     private boolean choiceContainsDirection(final String choice) {return this.choice.trim().contains("go") || this.choice.trim().contains("GO");}
 
-    private boolean choiceContains(String choice, String keyword)
-    {
+    private boolean choiceContains(String choice, String keyword) {
         String processedChoice = choice.trim().toLowerCase();
         String processedKeyword = keyword.trim().toLowerCase();
         return processedChoice.contains(processedKeyword);

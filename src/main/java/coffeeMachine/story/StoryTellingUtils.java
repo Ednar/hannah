@@ -2,6 +2,9 @@ package coffeeMachine.story;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Innehåller hjälpmetoder för att skriva ut text med olika hastighet till konsolen.
+ */
 public class StoryTellingUtils {
 
     public static void slowWrite(String text) {
