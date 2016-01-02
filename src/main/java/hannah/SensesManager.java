@@ -41,7 +41,7 @@ class SensesManager {
     void addTemperatureAgent() {
         try {
             String localName = "temperature";
-            containerController.createNewAgent(localName, "hannah.temperatureAgentAID.TemperatureAgent", null).start();
+            containerController.createNewAgent(localName, "hannah.temperatureAgent.TemperatureAgent", null).start();
             temperatureAgentAID = new AID(localName, AID.ISLOCALNAME);
         } catch (ControllerException e) {
             e.printStackTrace();
