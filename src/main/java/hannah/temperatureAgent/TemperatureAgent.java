@@ -17,12 +17,12 @@ public class TemperatureAgent extends Agent {
     @Override
     protected void setup() {
         System.out.println("Temperaturagent är igång");
+        String filePath = w1DirPath;
+        File file = new File(filePath);
         addBehaviour(new TickerBehaviour(this, 1_000) {
             @Override
             protected void onTick() {
                 System.out.println("Temperatur kontrolleras");
-                String filePath = w1DirPath;
-                File file = new File(filePath);
                 try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                     String output;
                     if ((output = br.readLine()) != null) {
