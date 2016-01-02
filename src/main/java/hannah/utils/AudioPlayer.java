@@ -3,77 +3,64 @@ package hannah.utils;
 import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
-public class AudioPlayer implements LineListener{
+public class AudioPlayer {
 
-    /**
-     * this flag indicates whether the playback completes or not.
-     */
-    boolean playCompleted;
+    private boolean playCompleted;
+    private Clip clip;
 
-    /**
-     * Play a given audio file.
-     * @param audioFilePath Path of the audio file.
-     */
+    ExecutorService executorService = Executors.newFixedThreadPool(1);
+
     public void play(String audioFilePath) {
+        if (!playCompleted && clip != null) {
+            clip.stop();
+            executorService.shutdownNow();
+        }
+        executorService = Executors.newFixedThreadPool(1);
+
         File audioFile = new File(audioFilePath);
 
-        try {
-            AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
+        executorService.submit((Runnable) () -> {
+            try {
+                AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
+                AudioFormat format = audioStream.getFormat();
 
-            AudioFormat format = audioStream.getFormat();
+                DataLine.Info info = new DataLine.Info(Clip.class, format);
+                clip = (Clip) AudioSystem.getLine(info);
 
-            DataLine.Info info = new DataLine.Info(Clip.class, format);
+                clip.open(audioStream);
 
-            Clip audioClip = (Clip) AudioSystem.getLine(info);
+                clip.start();
 
-            audioClip.addLineListener(this);
-
-            audioClip.open(audioStream);
-
-            audioClip.start();
-
-            while (!playCompleted) {
-                // wait for the playback completes
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
+                while (!playCompleted) {
+                    // vänta på att klip ska spela klart
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
                 }
+
+                clip.close();
+
+            } catch (UnsupportedAudioFileException ex) {
+                System.out.println("The specified audio file is not supported.");
+                ex.printStackTrace();
+            } catch (LineUnavailableException ex) {
+                System.out.println("Audio line for playing back is unavailable.");
+                ex.printStackTrace();
+            } catch (IOException ex) {
+                System.out.println("Error playing the audio file.");
+                ex.printStackTrace();
             }
+        });
 
-            audioClip.close();
-
-        } catch (UnsupportedAudioFileException ex) {
-            System.out.println("The specified audio file is not supported.");
-            ex.printStackTrace();
-        } catch (LineUnavailableException ex) {
-            System.out.println("Audio line for playing back is unavailable.");
-            ex.printStackTrace();
-        } catch (IOException ex) {
-            System.out.println("Error playing the audio file.");
-            ex.printStackTrace();
-        }
 
     }
 
-    /**
-     * Listens to the START and STOP events of the audio line.
-     */
-    @Override
-    public void update(LineEvent event) {
-        LineEvent.Type type = event.getType();
-
-        if (type == LineEvent.Type.START) {
-            System.out.println("Playback started.");
-
-        } else if (type == LineEvent.Type.STOP) {
-            playCompleted = true;
-            System.out.println("Playback completed.");
-        }
-
-    }
 
 
 }
