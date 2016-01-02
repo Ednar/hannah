@@ -57,7 +57,7 @@ public class ConcurrentMoodHannah extends Agent {
                 } else {
                     System.out.println("Hannah är lessen... :( (gråt)");
                     AudioPlayer player  = new AudioPlayer();
-                   player.play("cry.wav");
+                    player.play("cry.wav");
                 }
                 // Vänta lite innan nästa behov kontrolleras. Egentligen bara för
                 // Ljud ska hinna spelas
@@ -101,6 +101,7 @@ public class ConcurrentMoodHannah extends Agent {
             switch (step) {
                 // Kollar hunger
                 case 0:
+                    System.out.println("Kontrollerar hunger...");
                     // Se om det finns något inform-meddelande som har ämnet hunger.
                     // Ta bara emot ett sådant meddelande
                     MessageTemplate hungerTemplate = MessageTemplate.and(
@@ -117,6 +118,7 @@ public class ConcurrentMoodHannah extends Agent {
                     break;
                 // Kolla sömnig
                 case 1:
+                    System.out.println("Kontrollerar sömn...");
                     // Se om det finns något inform-meddelande som har ämnet sleepy. Ta bara emot ett sådant meddelande
                     MessageTemplate sleepyTemplate = MessageTemplate.and(
                             MessageTemplate.MatchPerformative(ACLMessage.INFORM),
@@ -130,6 +132,7 @@ public class ConcurrentMoodHannah extends Agent {
                     step++; // Kolla nästa humör
                     break;
                 case 2:
+                    System.out.println("Kontrollerar temperatur...");
 
                     ACLMessage temperatureRequest = new ACLMessage(ACLMessage.REQUEST);
                     temperatureRequest.addReceiver(sensesManager.getTemperatureAID());
