@@ -3,64 +3,55 @@ package hannah.utils;
 import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
 public class AudioPlayer {
 
-    private boolean playCompleted;
     private Clip clip;
 
-    ExecutorService executorService = Executors.newFixedThreadPool(1);
+    private ExecutorService executorService = Executors.newFixedThreadPool(1);
+    private String audioFilePath;
 
     public void play(String audioFilePath) {
-        if (!playCompleted && clip != null) {
+        if (clip != null && clip.isRunning() && !Objects.equals(this.audioFilePath, audioFilePath)) {
             clip.stop();
             executorService.shutdownNow();
         }
-        executorService = Executors.newFixedThreadPool(1);
 
-        File audioFile = new File(audioFilePath);
+        if ( (clip != null &&  !clip.isRunning() )  || !Objects.equals(this.audioFilePath, audioFilePath) ) {
+            this.audioFilePath = audioFilePath;
 
-        executorService.submit((Runnable) () -> {
-            try {
-                AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
-                AudioFormat format = audioStream.getFormat();
+            executorService = Executors.newFixedThreadPool(1);
 
-                DataLine.Info info = new DataLine.Info(Clip.class, format);
-                clip = (Clip) AudioSystem.getLine(info);
+            File audioFile = new File(audioFilePath);
 
-                clip.open(audioStream);
+            executorService.submit((Runnable) () -> {
+                try {
+                    AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
+                    AudioFormat format = audioStream.getFormat();
 
-                clip.start();
+                    DataLine.Info info = new DataLine.Info(Clip.class, format);
+                    clip = (Clip) AudioSystem.getLine(info);
 
-                while (!playCompleted) {
-                    // vänta på att klip ska spela klart
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
-                    }
+                    clip.open(audioStream);
+
+                    clip.start();
+
+                } catch (UnsupportedAudioFileException ex) {
+                    System.out.println("The specified audio file is not supported.");
+                    ex.printStackTrace();
+                } catch (LineUnavailableException ex) {
+                    System.out.println("Audio line for playing back is unavailable.");
+                    ex.printStackTrace();
+                } catch (IOException ex) {
+                    System.out.println("Error playing the audio file.");
+                    ex.printStackTrace();
                 }
-
-                clip.close();
-
-            } catch (UnsupportedAudioFileException ex) {
-                System.out.println("The specified audio file is not supported.");
-                ex.printStackTrace();
-            } catch (LineUnavailableException ex) {
-                System.out.println("Audio line for playing back is unavailable.");
-                ex.printStackTrace();
-            } catch (IOException ex) {
-                System.out.println("Error playing the audio file.");
-                ex.printStackTrace();
-            }
-        });
-
-
+            });
+        }
     }
-
-
 
 }
