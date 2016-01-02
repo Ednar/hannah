@@ -133,18 +133,24 @@ public class ConcurrentMoodHannah extends Agent {
                     break;
                 case 2:
                     System.out.println("Kontrollerar temperatur...");
+
+                    ACLMessage temperatureRequset = new ACLMessage(ACLMessage.REQUEST);
+                    temperatureRequset.addReceiver(sensesManager.getTemperatureAID());
+                    temperatureRequset.setConversationId(ConversationIds.TEMP);
+                    send(temperatureRequset);
+
                     MessageTemplate temperatureTemplate = MessageTemplate.and(
                             MessageTemplate.MatchPerformative(ACLMessage.INFORM),
                             MessageTemplate.MatchConversationId(ConversationIds.TEMP));
 
                     // Ta emot ett meddelande. Om det är null fanns ingen sömn.
-                    ACLMessage temperatureMessage = receive(temperatureTemplate);
+                    ACLMessage temperatureMessage = blockingReceive(temperatureTemplate);
                     if (temperatureMessage != null) {
-                        double temperatur = Double.parseDouble(temperatureMessage.getContent());
-                        System.out.println("Kroppstemperatur: " + temperatur);
-                        if (temperatur > 25) {
+                        double temperature = Double.parseDouble(temperatureMessage.getContent());
+                        System.out.println("Kroppstemperatur: " + temperature);
+                        if (temperature > 25) {
                             warm = true;
-                        } else  if (temperatur < 20) {
+                        } else  if (temperature < 20) {
                             cold = true;
                         } else {
                             warm = false;

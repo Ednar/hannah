@@ -1,6 +1,6 @@
 #!/bin/sh
 
-HOST="10.0.1.6"
+HOST="192.168.1.116"
 AGENT="hannah"
 AGENT_CLASS=hannah.ConcurrentMoodHannah
 
