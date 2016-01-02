@@ -20,7 +20,6 @@ public class TemperatureAgent extends Agent {
 
     @Override
     protected void setup() {
-        System.out.println("Temperaturagent är igång");
         String filePath = w1DirPath;
         File file = new File(filePath);
 
@@ -39,10 +38,7 @@ public class TemperatureAgent extends Agent {
                             // Divide by 1000 to get degrees Celsius
                             tempC /= 1000;
                             lastMeasuredTemperature = tempC;
-
-
                         }
-
                     }
                 } catch (Exception ex) {
                     System.out.println(ex.getMessage());
@@ -60,7 +56,6 @@ public class TemperatureAgent extends Agent {
                     reply.setContent(String.valueOf(lastMeasuredTemperature));
                     send(reply);
                 }
-
             }
         });
     }
