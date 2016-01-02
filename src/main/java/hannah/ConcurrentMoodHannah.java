@@ -102,6 +102,7 @@ public class ConcurrentMoodHannah extends Agent {
                     ACLMessage hungerResponse = receive(hungerTemplate);
                     if (hungerResponse != null) {
                         hungry = true;
+                        System.out.println("hannah vill ha: " + hungerResponse.getContent());
                     }
                     step++; // kolla nästa humör
                     break;
@@ -132,14 +133,20 @@ public class ConcurrentMoodHannah extends Agent {
         }
     }
 
-    public void feed(final int calories) {
+    public void feed(final String dish) {
         if (hungry) {
             ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
             message.addReceiver(sensesManager.getHungerAgentAID());
             message.setConversationId(ConversationIds.HUNGER);
-            message.setContent(String.valueOf(calories));
+            message.setContent(String.valueOf(dish));
             send(message);
-            hungry = false; // TODO här bör hungeragenten bedöma om hunger finns
+
+            ACLMessage response = blockingReceive(MessageTemplate.MatchConversationId(ConversationIds.HUNGER));
+            if (response.getPerformative() == ACLMessage.ACCEPT_PROPOSAL) {
+                hungry = false;
+            } else {
+                System.out.println("Hannah ville inte ha " + dish);
+            }
         }
 
     }
@@ -153,7 +160,7 @@ public class ConcurrentMoodHannah extends Agent {
             sleepy = false; // TODO här bör sömnagenten bedöma om hunger finns
             System.out.println("Hannah sover 15 sekunder... reagerar inte på input");
             try {
-                TimeUnit.SECONDS.sleep(15);
+                TimeUnit.MINUTES.sleep(1);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

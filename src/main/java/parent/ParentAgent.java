@@ -10,13 +10,14 @@ import java.util.Scanner;
 
 public class ParentAgent extends Agent {
 
+    private Scanner scanner = new Scanner(System.in);
+
     @Override
     protected void setup() {
 
         addBehaviour(new CyclicBehaviour() {
             @Override
             public void action() {
-                Scanner scanner = new Scanner(System.in);
                 System.out.println("1) Mata hannah");
                 System.out.println("2) Lägg hannah");
                 String input = scanner.nextLine();
@@ -31,9 +32,22 @@ public class ParentAgent extends Agent {
     }
 
     private void feed() {
+        System.out.println("Select food option");
+        System.out.println("1) Pasta");
+        System.out.println("2) Lasagna");
+        System.out.println("3) Hamburger");
+        int input = Integer.parseInt(scanner.nextLine());
         ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
         message.addReceiver(new AID("hannah", AID.ISLOCALNAME));
         message.setConversationId(ConversationIds.HUNGER);
+        switch (input){
+            case 1: message.setContent("Pasta");
+                break;
+            case 2: message.setContent("Lasagna");
+                break;
+            case 3: message.setContent("Hamburger");
+                break;
+        }
         send(message);
     }
 

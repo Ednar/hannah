@@ -24,7 +24,7 @@ public class UserInteractionBehaviour extends Behaviour {
             String conversationId = message.getConversationId();
             switch (conversationId) {
                 case ConversationIds.HUNGER:
-                    hannah.feed(10_000);
+                    hannah.feed(message.getContent());
                     break;
                 case ConversationIds.SLEEP:
                     hannah.rest();
