@@ -121,12 +121,25 @@ public class ConcurrentMoodHannah extends Agent {
                     }
                     step++; // Kolla nästa humör
                     break;
+                case 2:
+                    System.out.println("Kontrollerar temperatur...");
+                    MessageTemplate temperatureTemplate = MessageTemplate.and(
+                            MessageTemplate.MatchPerformative(ACLMessage.INFORM),
+                            MessageTemplate.MatchConversationId(ConversationIds.TEMP));
+
+                    // Ta emot ett meddelande. Om det är null fanns ingen sömn.
+                    ACLMessage temperatureMessage = receive(temperatureTemplate);
+                    if (temperatureMessage != null) {
+                        System.out.println("Kroppstemperatur: " + temperatureMessage.getContent());
+                    }
+                    step++; // Kolla nästa humör
+
             }
         }
 
         @Override
         public boolean done() {
-            if (step > 1) {
+            if (step > 2) {
                 step = 0; // Börja om
             }
             return false;
@@ -152,7 +165,7 @@ public class ConcurrentMoodHannah extends Agent {
     }
 
     public void rest() {
-        if (sleepy) {
+        if (sleepy && !hungry) {
             ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
             message.addReceiver(sensesManager.getSleepAgentAID());
             message.setConversationId(ConversationIds.SLEEP);
