@@ -27,7 +27,6 @@ public class TemperatureAgent extends Agent {
         addBehaviour(new CyclicBehaviour(this) {
             @Override
             public void action() {
-                System.out.println("Läser temperatur");
                 try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                     String output;
                     br.readLine();
@@ -54,7 +53,6 @@ public class TemperatureAgent extends Agent {
         addBehaviour(new CyclicBehaviour() {
             @Override
             public void action() {
-                System.out.println("Kontrollerar temperaturerequest");
                 ACLMessage receive = receive(MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
                 if (receive != null) {
                     ACLMessage reply = receive.createReply();
