@@ -10,7 +10,7 @@ class SensesManager {
 
     private AID hungerAgentAID;
     private AID sleepAgentAID;
-    private AID temperatureAgent;
+    private AID temperatureAgentAID;
     private AID temperatureAID;
 
     SensesManager(final ConcurrentMoodHannah hannah) {
@@ -41,8 +41,8 @@ class SensesManager {
     void addTemperatureAgent() {
         try {
             String localName = "temperature";
-            containerController.createNewAgent(localName, "hannah.temperatureAgent.TemperatureAgent", null).start();
-            temperatureAgent = new AID(localName, AID.ISLOCALNAME);
+            containerController.createNewAgent(localName, "hannah.temperatureAgentAID.TemperatureAgent", null).start();
+            temperatureAgentAID = new AID(localName, AID.ISLOCALNAME);
         } catch (ControllerException e) {
             e.printStackTrace();
         }
@@ -57,6 +57,6 @@ class SensesManager {
     }
 
     public AID getTemperatureAID() {
-        return temperatureAID;
+        return temperatureAgentAID;
     }
 }
