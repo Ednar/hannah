@@ -10,6 +10,7 @@ class SensesManager {
 
     private AID hungerAgentAID;
     private AID sleepAgentAID;
+    private AID temperatureAgent;
 
     SensesManager(final ConcurrentMoodHannah hannah) {
         // Container används för att starta nya agenter programmatiskt
@@ -31,6 +32,16 @@ class SensesManager {
             String localName = "sleep";
             containerController.createNewAgent(localName, "hannah.sleepAgent.SleepAgent", null).start();
             sleepAgentAID = new AID(localName, AID.ISLOCALNAME);
+        } catch (ControllerException e) {
+            e.printStackTrace();
+        }
+    }
+
+    void addTemperatureAgent() {
+        try {
+            String localName = "sleep";
+            containerController.createNewAgent(localName, "hannah.temperatureAgent.TemperatureAgent", null).start();
+            temperatureAgent = new AID(localName, AID.ISLOCALNAME);
         } catch (ControllerException e) {
             e.printStackTrace();
         }

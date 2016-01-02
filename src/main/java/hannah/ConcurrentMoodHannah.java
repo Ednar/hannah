@@ -40,6 +40,7 @@ public class ConcurrentMoodHannah extends Agent {
         sensesManager = new SensesManager(this);
         sensesManager.addHungerAgent();
         sensesManager.addSleepAgent();
+        sensesManager.addTemperatureAgent();
 
         addBehaviour(new CyclicBehaviour() {
             @Override
