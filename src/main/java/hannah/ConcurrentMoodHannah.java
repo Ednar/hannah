@@ -52,7 +52,7 @@ public class ConcurrentMoodHannah extends Agent {
                     AudioPlayer player = new AudioPlayer();
                     System.out.println("Hannah är glad (skratt)");
 
-                    player.play("giggle.wav");
+                    //player.play("giggle.wav");
 
                 } else {
                     System.out.println("Hannah är lessen... :( (gråt)");
