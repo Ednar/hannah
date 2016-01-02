@@ -20,6 +20,7 @@ public class AudioPlayer {
     public void play(String audioFilePath) {
         if (clip != null && clip.isRunning() && !Objects.equals(this.audioFilePath, audioFilePath)) {
             clip.stop();
+            clip.close();
             playingClip.cancel(true);
         }
 
@@ -35,7 +36,6 @@ public class AudioPlayer {
 
                     DataLine.Info info = new DataLine.Info(Clip.class, format);
                     clip = (Clip) AudioSystem.getLine(info);
-
                     clip.open(audioStream);
                     clip.start();
 

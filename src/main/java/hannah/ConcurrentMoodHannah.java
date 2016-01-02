@@ -59,7 +59,13 @@ public class ConcurrentMoodHannah extends Agent {
 
                     player.play("cry.wav");
                 }
-
+                // Vänta lite innan nästa behov kontrolleras. Egentligen bara för
+                // Ljud ska hinna spelas
+                try {
+                    TimeUnit.MICROSECONDS.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
