@@ -134,6 +134,7 @@ public class ConcurrentMoodHannah extends Agent {
                         System.out.println("Kroppstemperatur: " + temperatureMessage.getContent());
                     }
                     step++; // Kolla nästa humör
+                    break;
 
             }
         }
