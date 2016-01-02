@@ -22,10 +22,10 @@ public class TemperatureAgent extends Agent {
         addBehaviour(new TickerBehaviour(this, 1_000) {
             @Override
             protected void onTick() {
-                System.out.println("Temperatur kontrolleras");
                 try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                     String output;
                     if ((output = br.readLine()) != null) {
+                        System.out.println(output);
                         int idx = output.indexOf("t=");
                         if (idx > -1) {
                             // Temp data (multiplied by 1000) in 5 chars after t=
