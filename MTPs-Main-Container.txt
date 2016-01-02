@@ -1,1 +1,1 @@
-http://130.243.40.28:7778/acc
+http://pc-ltr3.du.se:7778/acc
