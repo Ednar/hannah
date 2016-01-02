@@ -1,18 +1,19 @@
 package hannah;
 
+import hannah.utils.AudioPlayer;
 import jade.MicroBoot;
-import jade.core.MicroRuntime;
 
 public class App extends MicroBoot {
 
     public static void main(String[] args) {
-        MicroBoot.main(args);
 
-        try {
-            MicroRuntime.startAgent("hannah", "hannah.ConcurrentMoodHannah", null);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        AudioPlayer player = new AudioPlayer();
+
+        player.play("cry.wav");
+        player = new AudioPlayer();
+        player.play("giggle.wav");
+
     }
 
 }
