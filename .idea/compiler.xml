@@ -24,8 +24,16 @@
         <processorPath useClasspath="true" />
         <module name="labb2_coffeeMachine" />
       </profile>
+      <profile default="false" name="Annotation profile for hannah" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="hannah" />
+      </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="hannah" target="1.8" />
       <module name="labb2_coffeeMachine" target="1.8" />
     </bytecodeTargetLevel>
   </component>

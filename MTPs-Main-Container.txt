@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 http://raspberrypi:7778/acc
+=======
+http://10.0.1.6:7778/acc
+>>>>>>> 9181b41ad5d8c4cc662d876d4d7cc7acb245f55c
