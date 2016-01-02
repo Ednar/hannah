@@ -1,6 +1,7 @@
 package hannah;
 
 import hannah.behaviour.UserInteractionBehaviour;
+import hannah.utils.AudioPlayer;
 import hannah.utils.ConversationIds;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
@@ -30,6 +31,8 @@ public class ConcurrentMoodHannah extends Agent {
     private boolean hungry;
     private boolean sleepy;
     private boolean warm;
+    private boolean cold;
+
     private SensesManager sensesManager;
 
     @Override
@@ -46,9 +49,15 @@ public class ConcurrentMoodHannah extends Agent {
             @Override
             public void action() {
                 if (happy()) {
+                    AudioPlayer player = new AudioPlayer();
                     System.out.println("Hannah är glad (skratt)");
+
+                    player.play("giggle.wav");
+
                 } else {
                     System.out.println("Hannah är lessen... :( (gråt)");
+                    AudioPlayer player  = new AudioPlayer();
+                    player.play("cry.wav");
                 }
                 // Vänta lite innan nästa behov kontrolleras. Egentligen bara för
                 // Ljud ska hinna spelas
@@ -79,7 +88,7 @@ public class ConcurrentMoodHannah extends Agent {
 
 
     private boolean happy() {
-        return !hungry && !sleepy && !warm;
+        return !hungry && !sleepy && !warm && !cold;
     }
 
     private class MoodStepBehaviour extends Behaviour {
@@ -131,7 +140,16 @@ public class ConcurrentMoodHannah extends Agent {
                     // Ta emot ett meddelande. Om det är null fanns ingen sömn.
                     ACLMessage temperatureMessage = receive(temperatureTemplate);
                     if (temperatureMessage != null) {
-                        System.out.println("Kroppstemperatur: " + temperatureMessage.getContent());
+                        double temperatur = Double.parseDouble(temperatureMessage.getContent());
+                        System.out.println("Kroppstemperatur: " + temperatur);
+                        if (temperatur > 25) {
+                            warm = true;
+                        } else  if (temperatur < 20) {
+                            cold = true;
+                        } else {
+                            warm = false;
+                            cold = false;
+                        }
                     }
                     step++; // Kolla nästa humör
                     break;
@@ -167,7 +185,7 @@ public class ConcurrentMoodHannah extends Agent {
     }
 
     public void rest() {
-        if (sleepy && !hungry) {
+        if (sleepy && !hungry && !cold && !warm) {
             ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
             message.addReceiver(sensesManager.getSleepAgentAID());
             message.setConversationId(ConversationIds.SLEEP);
