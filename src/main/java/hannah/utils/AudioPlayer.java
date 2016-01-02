@@ -6,29 +6,29 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 
 public class AudioPlayer {
 
     private Clip clip;
 
-    private ExecutorService executorService = Executors.newFixedThreadPool(1);
+    private ExecutorService executorService = Executors.newCachedThreadPool();
     private String audioFilePath;
+    private Future<?> playingClip;
 
     public void play(String audioFilePath) {
         if (clip != null && clip.isRunning() && !Objects.equals(this.audioFilePath, audioFilePath)) {
             clip.stop();
-            executorService.shutdownNow();
+            playingClip.cancel(true);
         }
 
         if ( (clip != null &&  !clip.isRunning() )  || !Objects.equals(this.audioFilePath, audioFilePath) ) {
             this.audioFilePath = audioFilePath;
 
-            executorService = Executors.newFixedThreadPool(1);
-
             File audioFile = new File(audioFilePath);
 
-            executorService.submit((Runnable) () -> {
+            playingClip = executorService.submit((Runnable) () -> {
                 try {
                     AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
                     AudioFormat format = audioStream.getFormat();
@@ -37,7 +37,6 @@ public class AudioPlayer {
                     clip = (Clip) AudioSystem.getLine(info);
 
                     clip.open(audioStream);
-
                     clip.start();
 
                 } catch (UnsupportedAudioFileException ex) {
