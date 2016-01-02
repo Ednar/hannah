@@ -1,8 +1,8 @@
 #!/bin/sh
 
-HOST="localhost"
+HOST="10.0.1.6"
 AGENT="hannah"
-AGENT_CLASS=hannah.Hannah
+AGENT_CLASS="hannah.Hannah"
 
 printf "Machine %s" "$AGENT" | figlet
 
