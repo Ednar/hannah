@@ -200,6 +200,7 @@ public class ConcurrentMoodHannah extends Agent {
             System.out.println("Hannah sover 15 sekunder... reagerar inte på input");
             try {
                 TimeUnit.MINUTES.sleep(1);
+
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
