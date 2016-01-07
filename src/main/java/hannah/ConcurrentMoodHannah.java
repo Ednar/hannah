@@ -62,7 +62,7 @@ public class ConcurrentMoodHannah extends Agent {
                 // Vänta lite innan nästa behov kontrolleras. Egentligen bara för
                 // Ljud ska hinna spelas
                 try {
-                    TimeUnit.MICROSECONDS.sleep(500);
+                    TimeUnit.SECONDS.sleep(1);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

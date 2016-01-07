@@ -1,7 +1,7 @@
 #!/bin/sh
 
 
-HOST="localhost"
+HOST="10.0.1.6"
 AGENT="parent"
 AGENT_PATH=parent.ParentAgent
 

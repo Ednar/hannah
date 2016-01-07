@@ -15,27 +15,26 @@ public class AudioPlayer {
 
     private ExecutorService executorService = Executors.newCachedThreadPool();
     private String audioFilePath;
-    private Future<?> playingClip;
 
     public void play(String audioFilePath) {
-        if (clip != null && clip.isRunning() && !Objects.equals(this.audioFilePath, audioFilePath)) {
-            clip.stop();
-            clip.close();
-            playingClip.cancel(true);
+        if (clip != null && clip.isOpen()) {
+            if (this.audioFilePath != null && !this.audioFilePath.equals(audioFilePath)) {
+                stop();
+            }
         }
 
-        if ( (clip != null &&  !clip.isRunning() )  || !Objects.equals(this.audioFilePath, audioFilePath) ) {
-            this.audioFilePath = audioFilePath;
+        this.audioFilePath = audioFilePath;
+        File audioFile = new File(audioFilePath);
 
-            File audioFile = new File(audioFilePath);
-
-            playingClip = executorService.submit((Runnable) () -> {
+        if (clip != null && !clip.isRunning() || clip == null) {
+            executorService.submit((Runnable) () -> {
                 try {
                     AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
                     AudioFormat format = audioStream.getFormat();
 
                     DataLine.Info info = new DataLine.Info(Clip.class, format);
                     clip = (Clip) AudioSystem.getLine(info);
+
                     clip.open(audioStream);
                     clip.start();
 
@@ -51,6 +50,12 @@ public class AudioPlayer {
                 }
             });
         }
+    }
+
+
+    private void stop() {
+        clip.stop();
+        clip.close();
     }
 
 }
