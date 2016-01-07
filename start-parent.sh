@@ -1,7 +1,7 @@
 #!/bin/sh
 
 
-HOST="192.168.1.116"
+HOST="10.0.1.6"
 AGENT="parent"
 AGENT_PATH=parent.ParentAgent
 

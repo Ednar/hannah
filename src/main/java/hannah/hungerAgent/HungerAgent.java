@@ -68,7 +68,7 @@ public class HungerAgent extends Agent {
 
             private void decrementFullnessLevel() {
                 System.out.println("Hungernivå: " + fullnessLevel);
-                fullnessLevel -= 1000; // TODO randomisera
+                fullnessLevel -= 100; // TODO randomisera
             }
         });
     }

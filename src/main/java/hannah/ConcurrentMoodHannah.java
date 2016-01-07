@@ -44,20 +44,20 @@ public class ConcurrentMoodHannah extends Agent {
         sensesManager.addHungerAgent();
         sensesManager.addSleepAgent();
         sensesManager.addTemperatureAgent();
+        AudioPlayer player  = new AudioPlayer();
 
         addBehaviour(new CyclicBehaviour() {
             @Override
             public void action() {
                 if (happy()) {
-                    AudioPlayer player = new AudioPlayer();
                     System.out.println("Hannah är glad (skratt)");
 
-            //        player.play("giggle.wav");
+                    player.play("giggle.wav");
 
                 } else {
                     System.out.println("Hannah är lessen... :( (gråt)");
-                    AudioPlayer player  = new AudioPlayer();
-          //          player.play("cry.wav");
+
+                    player.play("cry.wav");
                 }
                 // Vänta lite innan nästa behov kontrolleras. Egentligen bara för
                 // Ljud ska hinna spelas
@@ -133,6 +133,12 @@ public class ConcurrentMoodHannah extends Agent {
                     break;
                 case 2:
                     System.out.println("Kontrollerar temperatur...");
+
+                    ACLMessage temperatureRequest = new ACLMessage(ACLMessage.REQUEST);
+                    temperatureRequest.addReceiver(sensesManager.getTemperatureAID());
+                    temperatureRequest.setConversationId(ConversationIds.TEMP);
+                    send(temperatureRequest);
+
                     MessageTemplate temperatureTemplate = MessageTemplate.and(
                             MessageTemplate.MatchPerformative(ACLMessage.INFORM),
                             MessageTemplate.MatchConversationId(ConversationIds.TEMP));
@@ -140,11 +146,11 @@ public class ConcurrentMoodHannah extends Agent {
                     // Ta emot ett meddelande. Om det är null fanns ingen sömn.
                     ACLMessage temperatureMessage = receive(temperatureTemplate);
                     if (temperatureMessage != null) {
-                        double temperatur = Double.parseDouble(temperatureMessage.getContent());
-                        System.out.println("Kroppstemperatur: " + temperatur);
-                        if (temperatur > 25) {
+                        double temperature = Double.parseDouble(temperatureMessage.getContent());
+                        System.out.println("Kroppstemperatur: " + temperature);
+                        if (temperature > 25) {
                             warm = true;
-                        } else  if (temperatur < 20) {
+                        } else  if (temperature < 20) {
                             cold = true;
                         } else {
                             warm = false;
