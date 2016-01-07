@@ -148,7 +148,9 @@ public class ConcurrentMoodHannah extends Agent {
                     if (temperatureMessage != null) {
                         double temperature = Double.parseDouble(temperatureMessage.getContent());
                         System.out.println("Kroppstemperatur: " + temperature);
-                        if (temperature > 25) {
+                        if (temperature > 40) {
+                            killHannah();
+                        } else if (temperature > 25) {
                             warm = true;
                         } else  if (temperature < 20) {
                             cold = true;
@@ -170,6 +172,16 @@ public class ConcurrentMoodHannah extends Agent {
             }
             return false;
         }
+    }
+
+    private void killHannah() {
+        player.play("death.wav");
+        try {
+            TimeUnit.SECONDS.sleep(6);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        doDelete();
     }
 
     public void feed(final String dish) {
