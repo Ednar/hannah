@@ -1,7 +1,11 @@
 #!/bin/sh
 
+if [[ "$#" != 1 ]]; then
+    echo "Du måste ange IP adress till main container" >&2
+    exit 1
+fi
 
-HOST="10.0.1.6"
+HOST=$1
 AGENT="parent"
 AGENT_PATH=parent.ParentAgent
 
