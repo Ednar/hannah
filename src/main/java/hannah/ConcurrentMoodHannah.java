@@ -57,7 +57,7 @@ public class ConcurrentMoodHannah extends Agent {
                     if (randomGlad < 1 ) {
                         player.play("giggle.wav");
                     } else {
-                        player.play("talk");
+                        player.play("talk.wav");
                     }
 
                 } else {
