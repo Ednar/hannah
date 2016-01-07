@@ -35,8 +35,8 @@ public class ConcurrentMoodHannah extends Agent {
     private boolean cold;
 
     private SensesManager sensesManager;
-    AudioPlayer player  = new AudioPlayer();
-    private boolean sleepAborted = false;
+    private AudioPlayer player  = new AudioPlayer();
+    private boolean sleeping = false;
 
     @Override
     protected void setup() {
@@ -51,7 +51,15 @@ public class ConcurrentMoodHannah extends Agent {
         addBehaviour(new CyclicBehaviour() {
             @Override
             public void action() {
-                if (happy()) {
+                if (sleeping) {
+                        // I demo är det bara förälder som väcker hannah
+                        player.play("snore.wav");
+                    try {
+                        TimeUnit.SECONDS.sleep(4);
+                    } catch (InterruptedException e1) {
+                        e1.printStackTrace();
+                    }
+                } else if (happy()) {
                     System.out.println("Hannah är glad (skratt)");
                     // Spelar ett slumpmässigt glädjeljud
                     Random random = new Random();
@@ -234,29 +242,14 @@ public class ConcurrentMoodHannah extends Agent {
             message.setConversationId(ConversationIds.SLEEP);
             send(message);
             sleepy = false; // TODO här bör sömnagenten bedöma om hunger finns
-            System.out.println("Hannah sover 15 sekunder... reagerar inte på input");
-            try {
-                while(true) {
-                    // I demo är det bara förälder som väcker hannah
-                    if (sleepAborted())
-                        break;
-                    player.play("snore.wav");
-                    TimeUnit.SECONDS.sleep(4);
-                }
-
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            System.out.println("Hannah sover... reagerar inte på input");
+            sleeping = true;
         }
     }
 
     // Metod för demo
-    private boolean sleepAborted() {
-        return sleepAborted;
-    }
-    // Metod för demo
     public void abortSleep() {
-        sleepAborted = true;
+        sleeping = false;
     }
 
 }
