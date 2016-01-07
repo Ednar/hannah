@@ -29,7 +29,7 @@ public class SleepAgent extends Agent {
                     ACLMessage requestMessage = blockingReceive();
                     if(requestMessage.getConversationId().equals(ConversationIds.SLEEP)) {
                         System.out.println("Sover lite...");
-                        energy = 30_000;
+                        energy = 3_000;
                     }
 
                 } else {
