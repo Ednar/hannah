@@ -20,15 +20,25 @@ public class ParentAgent extends Agent {
             public void action() {
                 System.out.println("1) Mata hannah");
                 System.out.println("2) Lägg hannah");
+                System.out.println("3) Väck hannah (för demo)");
                 String input = scanner.nextLine();
                 int numericInput = Integer.parseInt(input);
                 if (numericInput == 1) {
                     feed();
                 } else if (numericInput == 2) {
                     putToBed();
+                } else if (numericInput == 3) {
+                    wake();
                 }
             }
         });
+    }
+
+    private void wake() {
+        ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
+        message.addReceiver(new AID("hannah", AID.ISLOCALNAME));
+        message.setConversationId(ConversationIds.WAKE);
+        send(message);
     }
 
     private void feed() {

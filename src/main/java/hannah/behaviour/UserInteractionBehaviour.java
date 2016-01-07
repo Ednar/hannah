@@ -28,6 +28,10 @@ public class UserInteractionBehaviour extends Behaviour {
                     break;
                 case ConversationIds.SLEEP:
                     hannah.rest();
+                    break;
+                case ConversationIds.WAKE:
+                    hannah.abortSleep();
+                    break;
             }
         }
     }

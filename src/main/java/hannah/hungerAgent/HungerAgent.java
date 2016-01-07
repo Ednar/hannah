@@ -16,7 +16,7 @@ public class HungerAgent extends Agent {
 
     @Override
     protected void setup() {
-        fullnessLevel = 9_001; // Vegeta! What does the....
+        fullnessLevel = 0; // Hannah börjar hungrig
 
         addBehaviour(new TickerBehaviour(this, 1_000) {
             @Override
@@ -68,7 +68,7 @@ public class HungerAgent extends Agent {
 
             private void decrementFullnessLevel() {
                 System.out.println("Hungernivå: " + fullnessLevel);
-                fullnessLevel -= 100; // TODO randomisera
+                fullnessLevel -= 1; // Minskar sakta så hon inte blir hungrig igen under demo
             }
         });
     }

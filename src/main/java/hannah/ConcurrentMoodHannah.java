@@ -36,6 +36,7 @@ public class ConcurrentMoodHannah extends Agent {
 
     private SensesManager sensesManager;
     AudioPlayer player  = new AudioPlayer();
+    private boolean sleepAborted = false;
 
     @Override
     protected void setup() {
@@ -235,7 +236,10 @@ public class ConcurrentMoodHannah extends Agent {
             sleepy = false; // TODO här bör sömnagenten bedöma om hunger finns
             System.out.println("Hannah sover 15 sekunder... reagerar inte på input");
             try {
-                for (int i = 0; i < 10; i++) {
+                while(true) {
+                    // I demo är det bara förälder som väcker hannah
+                    if (sleepAborted())
+                        break;
                     player.play("snore.wav");
                     TimeUnit.SECONDS.sleep(4);
                 }
@@ -244,6 +248,15 @@ public class ConcurrentMoodHannah extends Agent {
                 e.printStackTrace();
             }
         }
+    }
+
+    // Metod för demo
+    private boolean sleepAborted() {
+        return sleepAborted;
+    }
+    // Metod för demo
+    public void abortSleep() {
+        sleepAborted = true;
     }
 
 }
