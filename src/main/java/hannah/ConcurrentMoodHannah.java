@@ -195,8 +195,20 @@ public class ConcurrentMoodHannah extends Agent {
             ACLMessage response = blockingReceive(MessageTemplate.MatchConversationId(ConversationIds.HUNGER));
             if (response.getPerformative() == ACLMessage.ACCEPT_PROPOSAL) {
                 hungry = false;
+                player.play("eating.wav");
+                try {
+                    TimeUnit.SECONDS.sleep(45); // Tid det tar att äta
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             } else {
                 System.out.println("Hannah ville inte ha " + dish);
+                player.play("nejtack.wav");
+                try {
+                    TimeUnit.SECONDS.sleep(3); // Tid det tar att skrika
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -218,4 +230,5 @@ public class ConcurrentMoodHannah extends Agent {
             }
         }
     }
+
 }
