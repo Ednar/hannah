@@ -15,39 +15,39 @@ public class AudioPlayer {
     private String audioFilePath;
 
     public void play(String audioFilePath) {
-        if (clip != null && clip.isOpen()) {
-            if (this.audioFilePath != null && !this.audioFilePath.equals(audioFilePath)) {
-                stop();
-            }
+        if (this.audioFilePath != null && !this.audioFilePath.equals(audioFilePath)) {
+            System.out.println("nu borde jag ju sluta....");
+            stop();
         }
 
         this.audioFilePath = audioFilePath;
         File audioFile = new File(audioFilePath);
 
-        if (clip != null && !clip.isRunning() || clip == null) {
-            executorService.submit((Runnable) () -> {
-                try {
-                    AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
-                    AudioFormat format = audioStream.getFormat();
+        if (clip != null && clip.isOpen()) return;
 
-                    DataLine.Info info = new DataLine.Info(Clip.class, format);
-                    clip = (Clip) AudioSystem.getLine(info);
+        executorService.submit((Runnable) () -> {
+            try {
+                AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
+                AudioFormat format = audioStream.getFormat();
 
-                    clip.open(audioStream);
-                    clip.start();
+                DataLine.Info info = new DataLine.Info(Clip.class, format);
+                clip = (Clip) AudioSystem.getLine(info);
 
-                } catch (UnsupportedAudioFileException ex) {
-                    System.out.println("The specified audio file is not supported.");
-                    ex.printStackTrace();
-                } catch (LineUnavailableException ex) {
-                    System.out.println("Audio line for playing back is unavailable.");
-                    ex.printStackTrace();
-                } catch (IOException ex) {
-                    System.out.println("Error playing the audio file.");
-                    ex.printStackTrace();
-                }
-            });
-        }
+                clip.open(audioStream);
+                clip.start();
+
+            } catch (UnsupportedAudioFileException ex) {
+                System.out.println("The specified audio file is not supported.");
+                ex.printStackTrace();
+            } catch (LineUnavailableException ex) {
+                System.out.println("Audio line for playing back is unavailable.");
+                clip.close();
+                ex.printStackTrace();
+            } catch (IOException ex) {
+                System.out.println("Error playing the audio file.");
+                ex.printStackTrace();
+            }
+        });
     }
 
 
