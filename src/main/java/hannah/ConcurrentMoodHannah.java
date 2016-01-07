@@ -52,10 +52,16 @@ public class ConcurrentMoodHannah extends Agent {
             public void action() {
                 if (happy()) {
                     System.out.println("Hannah är glad (skratt)");
+                    // Spelar ett slumpmässigt glädjeljud
                     Random random = new Random();
-                    int randomGlad = random.nextInt(5);
+                    int randomGlad = random.nextInt(10);
                     if (randomGlad < 1 ) {
                         player.play("giggle.wav");
+                        try {
+                            TimeUnit.SECONDS.sleep(4);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     } else {
                         player.play("talk.wav");
                     }
