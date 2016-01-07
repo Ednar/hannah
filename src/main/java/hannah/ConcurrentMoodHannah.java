@@ -229,9 +229,9 @@ public class ConcurrentMoodHannah extends Agent {
             sleepy = false; // TODO här bör sömnagenten bedöma om hunger finns
             System.out.println("Hannah sover 15 sekunder... reagerar inte på input");
             try {
-                for (int i = 0; i < 5; i++) {
+                for (int i = 0; i < 10; i++) {
                     player.play("snore.wav");
-                    TimeUnit.SECONDS.sleep(5);
+                    TimeUnit.SECONDS.sleep(4);
                 }
 
             } catch (InterruptedException e) {
