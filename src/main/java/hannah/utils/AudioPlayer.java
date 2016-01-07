@@ -16,14 +16,18 @@ public class AudioPlayer {
 
     public void play(String audioFilePath) {
         if (isNewFilePath(audioFilePath)) {
-            clip.stop();
-            clip.close();
-            clip = null;
+            closeDrainFlush();
+        }
+
+        if (sameClipIsStillRunning()) {
+            return;
+        }
+
+        if (sameClipHasFinishedPlaying()) {
+            closeDrainFlush();
         }
 
         this.audioFilePath = audioFilePath;
-
-        if (clip != null && clip.isOpen()) return;
 
         executorService.submit((Runnable) () -> {
             try {
@@ -35,6 +39,7 @@ public class AudioPlayer {
                 clip = (Clip) AudioSystem.getLine(info);
 
                 clip.open(audioStream);
+                System.out.println("spelar " + audioFilePath);
                 clip.start();
 
             } catch (UnsupportedAudioFileException ex) {
@@ -49,6 +54,16 @@ public class AudioPlayer {
                 ex.printStackTrace();
             }
         });
+    }
+
+    private boolean sameClipIsStillRunning() {return clip != null && clip.isRunning();}
+
+    private boolean sameClipHasFinishedPlaying() {return clip != null && clip.isOpen() && !clip.isRunning();}
+
+    private void closeDrainFlush() {
+        clip.close();
+        clip.drain();
+        clip.flush();
     }
 
     private boolean isNewFilePath(final String audioFilePath) {return this.audioFilePath != null && !this.audioFilePath.equals(audioFilePath);}

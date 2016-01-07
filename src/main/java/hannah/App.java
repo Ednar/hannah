@@ -12,10 +12,11 @@ public class App {
         AudioPlayer player = new AudioPlayer();
 
         player.play("cry.wav");
-        TimeUnit.SECONDS.sleep(1);
-        player.play("giggle.wav");
 
-        TimeUnit.SECONDS.sleep(1);
+        TimeUnit.SECONDS.sleep(12);
+        player.play("cry.wav");
+
+        TimeUnit.SECONDS.sleep(3);
         player.play("giggle.wav");
         TimeUnit.SECONDS.sleep(1);
         player.play("giggle.wav");
