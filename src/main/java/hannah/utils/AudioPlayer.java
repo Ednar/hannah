@@ -15,18 +15,19 @@ public class AudioPlayer {
     private String audioFilePath;
 
     public void play(String audioFilePath) {
-        if (this.audioFilePath != null && !this.audioFilePath.equals(audioFilePath)) {
-            System.out.println("nu borde jag ju sluta....");
-            stop();
+        if (isNewFilePath(audioFilePath)) {
+            clip.stop();
+            clip.close();
+            clip = null;
         }
 
         this.audioFilePath = audioFilePath;
-        File audioFile = new File(audioFilePath);
 
         if (clip != null && clip.isOpen()) return;
 
         executorService.submit((Runnable) () -> {
             try {
+                File audioFile = new File(audioFilePath);
                 AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
                 AudioFormat format = audioStream.getFormat();
 
@@ -50,10 +51,5 @@ public class AudioPlayer {
         });
     }
 
-
-    private void stop() {
-        clip.stop();
-        clip.close();
-    }
-
+    private boolean isNewFilePath(final String audioFilePath) {return this.audioFilePath != null && !this.audioFilePath.equals(audioFilePath);}
 }
