@@ -12,7 +12,7 @@ public class SleepAgent extends Agent {
 
     @Override
     protected void setup() {
-        energy = 30_000;
+        energy = 3_000;
         addBehaviour(new TickerBehaviour(this, 5_000) {
             @Override
             protected void onTick() {
@@ -29,7 +29,7 @@ public class SleepAgent extends Agent {
                     ACLMessage requestMessage = blockingReceive();
                     if(requestMessage.getConversationId().equals(ConversationIds.SLEEP)) {
                         System.out.println("Sover lite...");
-                        energy = 3_000;
+                        energy = 30_000;
                     }
 
                 } else {
