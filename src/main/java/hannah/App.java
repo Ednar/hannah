@@ -1,19 +1,24 @@
 package hannah;
 
 import hannah.utils.AudioPlayer;
-import jade.MicroBoot;
 
-public class App extends MicroBoot {
+import java.util.concurrent.TimeUnit;
 
-    public static void main(String[] args) {
+public class App {
+
+    public static void main(String[] args) throws InterruptedException {
 
 
         AudioPlayer player = new AudioPlayer();
 
         player.play("cry.wav");
-        player = new AudioPlayer();
+        TimeUnit.SECONDS.sleep(1);
         player.play("giggle.wav");
 
+        while (true) {
+            TimeUnit.MICROSECONDS.sleep(1);
+            player.play("giggle.wav");
+        }
     }
 
 }
