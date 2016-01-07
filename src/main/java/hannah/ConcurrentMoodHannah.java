@@ -35,7 +35,7 @@ public class ConcurrentMoodHannah extends Agent {
     private boolean cold;
 
     private SensesManager sensesManager;
-    private AudioPlayer player  = new AudioPlayer();
+    private final AudioPlayer player  = new AudioPlayer();
     private boolean sleeping = false;
 
     @Override
@@ -48,26 +48,31 @@ public class ConcurrentMoodHannah extends Agent {
         sensesManager.addSleepAgent();
         sensesManager.addTemperatureAgent();
 
+        // Hanterar kontroll av känslor
+        addBehaviour(new MoodStepBehaviour());
+        // Hanterar kontroll av input
+        addBehaviour(new UserInteractionBehaviour(this));
+
+        // Hanterar sinnen
         addBehaviour(new CyclicBehaviour() {
             @Override
             public void action() {
                 if (sleeping) {
-                        // I demo är det bara förälder som väcker hannah
-                        player.play("snore.wav");
+                    // I demo är det bara förälder som väcker hannah
+                    player.play("snore.wav");
                     try {
                         TimeUnit.SECONDS.sleep(4);
                     } catch (InterruptedException e1) {
                         e1.printStackTrace();
                     }
                 } else if (happy()) {
-                    System.out.println("Hannah är glad (skratt)");
                     // Spelar ett slumpmässigt glädjeljud
                     Random random = new Random();
-                    int randomGlad = random.nextInt(10);
+                    int randomGlad = random.nextInt(20);
                     if (randomGlad < 1 ) {
                         player.play("giggle.wav");
                         try {
-                            TimeUnit.SECONDS.sleep(4);
+                            TimeUnit.SECONDS.sleep(8); // kör detta för det är så cute
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -76,8 +81,6 @@ public class ConcurrentMoodHannah extends Agent {
                     }
 
                 } else {
-                    System.out.println("Hannah är lessen... :( (gråt)");
-
                     player.play("cry.wav");
                 }
                 // Vänta lite innan nästa behov kontrolleras. Egentligen bara för
@@ -90,10 +93,6 @@ public class ConcurrentMoodHannah extends Agent {
             }
         });
 
-        // Hanterar kontroll av känslor
-        addBehaviour(new MoodStepBehaviour());
-        // Hanterar kontroll av input
-        addBehaviour(new UserInteractionBehaviour(this));
     }
 
     //TODO implementera DF i hela programmet eller ta bort det
@@ -122,7 +121,6 @@ public class ConcurrentMoodHannah extends Agent {
             switch (step) {
                 // Kollar hunger
                 case 0:
-                    System.out.println("Kontrollerar hunger...");
                     // Se om det finns något inform-meddelande som har ämnet hunger.
                     // Ta bara emot ett sådant meddelande
                     MessageTemplate hungerTemplate = MessageTemplate.and(
@@ -139,7 +137,6 @@ public class ConcurrentMoodHannah extends Agent {
                     break;
                 // Kolla sömnig
                 case 1:
-                    System.out.println("Kontrollerar sömn...");
                     // Se om det finns något inform-meddelande som har ämnet sleepy. Ta bara emot ett sådant meddelande
                     MessageTemplate sleepyTemplate = MessageTemplate.and(
                             MessageTemplate.MatchPerformative(ACLMessage.INFORM),
@@ -153,8 +150,6 @@ public class ConcurrentMoodHannah extends Agent {
                     step++; // Kolla nästa humör
                     break;
                 case 2:
-                    System.out.println("Kontrollerar temperatur...");
-
                     ACLMessage temperatureRequest = new ACLMessage(ACLMessage.REQUEST);
                     temperatureRequest.addReceiver(sensesManager.getTemperatureAID());
                     temperatureRequest.setConversationId(ConversationIds.TEMP);

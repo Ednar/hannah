@@ -11,7 +11,6 @@ class SensesManager {
     private AID hungerAgentAID;
     private AID sleepAgentAID;
     private AID temperatureAgentAID;
-    private AID temperatureAID;
 
     SensesManager(final ConcurrentMoodHannah hannah) {
         // Container används för att starta nya agenter programmatiskt
@@ -56,7 +55,7 @@ class SensesManager {
         return sleepAgentAID;
     }
 
-    public AID getTemperatureAID() {
+    AID getTemperatureAID() {
         return temperatureAgentAID;
     }
 }

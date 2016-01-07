@@ -1,11 +1,7 @@
 package hannah.temperatureAgent;
 
-import hannah.utils.ConversationIds;
-import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
-import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
@@ -15,8 +11,8 @@ import java.io.FileReader;
 
 public class TemperatureAgent extends Agent {
 
-    String w1DirPath = "/sys/bus/w1/devices/28-021562c60fff/w1_slave";
-    double lastMeasuredTemperature;
+    private final String w1DirPath = "/sys/bus/w1/devices/28-021562c60fff/w1_slave";
+    private double lastMeasuredTemperature;
 
     @Override
     protected void setup() {

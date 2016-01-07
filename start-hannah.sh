@@ -9,7 +9,7 @@ HOST=$1
 AGENT="hannah"
 AGENT_CLASS="hannah.ConcurrentMoodHannah"
 
-printf "Machine %s" "$AGENT" | figlet
+printf "%s" "$AGENT" | figlet
 
 echo "Attempting to start agent with settings:"
 printf "Host: \t%s\nAgent: \t%s\nPath: \t%s\n" "$HOST" "$AGENT" "$AGENT_CLASS"

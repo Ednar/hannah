@@ -3,15 +3,15 @@ package hannah.temperatureAgent;
 import java.io.*;
 
 public class TemperatureSensor {
-    static String w1DirPath = "/sys/bus/w1/devices/28-021562c60fff/w1_slave";
-    static String filePath = w1DirPath;
-    static File file = new File(filePath);
+    private static final String w1DirPath = "/sys/bus/w1/devices/28-021562c60fff/w1_slave";
+    private static final String filePath = w1DirPath;
+    private static final File file = new File(filePath);
 
     public static void main(String[] args) {
         measureTemperature();
     }
 
-    public static void measureTemperature() {
+    private static void measureTemperature() {
 
         BufferedReader br;
         String output;

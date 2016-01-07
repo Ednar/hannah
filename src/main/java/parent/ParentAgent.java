@@ -3,54 +3,32 @@ package parent;
 import hannah.utils.ConversationIds;
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 
 import java.util.Scanner;
 
 public class ParentAgent extends Agent {
 
-    private Scanner scanner = new Scanner(System.in);
+    private final Scanner scanner = new Scanner(System.in);
 
     @Override
     protected void setup() {
 
-        addBehaviour(new CyclicBehaviour() {
-            @Override
-            public void action() {
-                System.out.println("1) Mata hannah");
-                System.out.println("2) Lägg hannah");
-                System.out.println("3) Väck hannah (för demo)");
-                String input = scanner.nextLine();
-                int numericInput = Integer.parseInt(input);
-                if (numericInput == 1) {
-                    feed();
-                } else if (numericInput == 2) {
-                    putToBed();
-                } else if (numericInput == 3) {
-                    wake();
-                }
-            }
-        });
+        ParentGui gui = new ParentGui(this);
     }
 
-    private void wake() {
+    public void wake() {
         ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
         message.addReceiver(new AID("hannah", AID.ISLOCALNAME));
         message.setConversationId(ConversationIds.WAKE);
         send(message);
     }
 
-    private void feed() {
-        System.out.println("Select food option");
-        System.out.println("1) Pasta");
-        System.out.println("2) Lasagna");
-        System.out.println("3) Hamburger");
-        int input = Integer.parseInt(scanner.nextLine());
+    public void feed(int dish) {
         ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
         message.addReceiver(new AID("hannah", AID.ISLOCALNAME));
         message.setConversationId(ConversationIds.HUNGER);
-        switch (input){
+        switch (dish){
             case 1: message.setContent("Pasta");
                 break;
             case 2: message.setContent("Lasagna");
@@ -61,7 +39,7 @@ public class ParentAgent extends Agent {
         send(message);
     }
 
-    private void putToBed() {
+    public void putToBed() {
         ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
         message.addReceiver(new AID("hannah", AID.ISLOCALNAME));
         message.setConversationId(ConversationIds.SLEEP);

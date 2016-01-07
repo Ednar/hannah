@@ -22,7 +22,8 @@ public class HungerAgent extends Agent {
             @Override
             protected void onTick() {
                 if (isHungry()) {
-                    cravedFood = getRandomFoodCraving();
+                    // cravedFood = getRandomFoodCraving(); utkommenterat för demo
+                    cravedFood = "Lasagna"; // Motsvarar äpple i GUI.
                     sendIsHungryMessage();
                     handleFoodProposals();
                 } else {
@@ -46,7 +47,6 @@ public class HungerAgent extends Agent {
                 message.setContent("Craving: " + cravedFood);
                 message.setSender(myAgent.getAID());
                 myAgent.send(message);
-                System.out.println("Skickar meddelande om hunger till hannah");
             }
 
             private void handleFoodProposals() {

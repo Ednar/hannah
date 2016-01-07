@@ -11,7 +11,7 @@ public class AudioPlayer {
 
     private Clip clip;
 
-    private ExecutorService executorService = Executors.newCachedThreadPool();
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
     private String audioFilePath;
 
     public void play(String audioFilePath) {
@@ -33,9 +33,7 @@ public class AudioPlayer {
 
                 DataLine.Info info = new DataLine.Info(Clip.class, format);
                 clip = (Clip) AudioSystem.getLine(info);
-
                 clip.open(audioStream);
-                System.out.println("spelar " + audioFilePath);
                 clip.start();
 
             } catch (UnsupportedAudioFileException ex) {
