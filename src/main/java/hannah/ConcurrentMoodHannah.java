@@ -148,7 +148,9 @@ public class ConcurrentMoodHannah extends Agent {
                     if (temperatureMessage != null) {
                         double temperature = Double.parseDouble(temperatureMessage.getContent());
                         System.out.println("Kroppstemperatur: " + temperature);
-                        if (temperature > 25) {
+                        if (temperature > 40) {
+                            killHannah();
+                        } else if (temperature > 25) {
                             warm = true;
                         } else  if (temperature < 20) {
                             cold = true;
@@ -172,6 +174,16 @@ public class ConcurrentMoodHannah extends Agent {
         }
     }
 
+    private void killHannah() {
+        player.play("death.wav");
+        try {
+            TimeUnit.SECONDS.sleep(6);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        doDelete();
+    }
+
     public void feed(final String dish) {
         if (hungry) {
             ACLMessage message = new ACLMessage(ACLMessage.PROPOSE);
@@ -183,8 +195,20 @@ public class ConcurrentMoodHannah extends Agent {
             ACLMessage response = blockingReceive(MessageTemplate.MatchConversationId(ConversationIds.HUNGER));
             if (response.getPerformative() == ACLMessage.ACCEPT_PROPOSAL) {
                 hungry = false;
+                player.play("eating.wav");
+                try {
+                    TimeUnit.SECONDS.sleep(45); // Tid det tar att äta
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             } else {
                 System.out.println("Hannah ville inte ha " + dish);
+                player.play("nejtack.wav");
+                try {
+                    TimeUnit.SECONDS.sleep(3); // Tid det tar att skrika
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -209,4 +233,5 @@ public class ConcurrentMoodHannah extends Agent {
             }
         }
     }
+
 }
