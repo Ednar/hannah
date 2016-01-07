@@ -15,10 +15,16 @@ public class App {
         TimeUnit.SECONDS.sleep(1);
         player.play("giggle.wav");
 
-        while (true) {
-            TimeUnit.MICROSECONDS.sleep(1);
-            player.play("giggle.wav");
-        }
+        TimeUnit.SECONDS.sleep(1);
+        player.play("giggle.wav");
+        TimeUnit.SECONDS.sleep(1);
+        player.play("giggle.wav");
+        TimeUnit.SECONDS.sleep(1);
+        player.play("giggle.wav");
+        TimeUnit.SECONDS.sleep(1);
+        player.play("giggle.wav");
+        TimeUnit.SECONDS.sleep(1);
+        player.play("giggle.wav");
     }
 
 }
