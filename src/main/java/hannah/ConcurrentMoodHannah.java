@@ -12,6 +12,7 @@ import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -51,8 +52,13 @@ public class ConcurrentMoodHannah extends Agent {
             public void action() {
                 if (happy()) {
                     System.out.println("Hannah är glad (skratt)");
-
-                    player.play("giggle.wav");
+                    Random random = new Random();
+                    int randomGlad = random.nextInt(5);
+                    if (randomGlad < 1 ) {
+                        player.play("giggle.wav");
+                    } else {
+                        player.play("talk");
+                    }
 
                 } else {
                     System.out.println("Hannah är lessen... :( (gråt)");

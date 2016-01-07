@@ -15,17 +15,13 @@ public class AudioPlayer {
     private String audioFilePath;
 
     public void play(String audioFilePath) {
-        if (isNewFilePath(audioFilePath)) {
+        if (isNewFilePath(audioFilePath))
             closeDrainFlush();
-        }
 
-        if (sameClipIsStillRunning()) {
-            return;
-        }
+        if (sameClipIsStillRunning()) return;
 
-        if (sameClipHasFinishedPlaying()) {
+        if (sameClipHasFinishedPlaying())
             closeDrainFlush();
-        }
 
         this.audioFilePath = audioFilePath;
 
