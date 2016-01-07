@@ -225,7 +225,7 @@ public class ConcurrentMoodHannah extends Agent {
             try {
                 for (int i = 0; i < 5; i++) {
                     player.play("snore.wav");
-                    TimeUnit.SECONDS.sleep(3);
+                    TimeUnit.SECONDS.sleep(5);
                 }
 
             } catch (InterruptedException e) {
