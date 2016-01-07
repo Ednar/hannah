@@ -1,8 +1,13 @@
 #!/bin/sh
 
-HOST="10.0.1.6"
+if [[ "$#" != 1 ]]; then
+    echo "Du måste ange IP adress till main container" >&2
+    exit 1
+fi
+
+HOST=$1
 AGENT="hannah"
-AGENT_CLASS="hannah.Hannah"
+AGENT_CLASS="hannah.ConcurrentMoodHannah"
 
 printf "Machine %s" "$AGENT" | figlet
 
