@@ -34,6 +34,7 @@ public class ConcurrentMoodHannah extends Agent {
     private boolean cold;
 
     private SensesManager sensesManager;
+    AudioPlayer player  = new AudioPlayer();
 
     @Override
     protected void setup() {
@@ -44,7 +45,6 @@ public class ConcurrentMoodHannah extends Agent {
         sensesManager.addHungerAgent();
         sensesManager.addSleepAgent();
         sensesManager.addTemperatureAgent();
-        AudioPlayer player  = new AudioPlayer();
 
         addBehaviour(new CyclicBehaviour() {
             @Override
@@ -199,7 +199,10 @@ public class ConcurrentMoodHannah extends Agent {
             sleepy = false; // TODO här bör sömnagenten bedöma om hunger finns
             System.out.println("Hannah sover 15 sekunder... reagerar inte på input");
             try {
-                TimeUnit.MINUTES.sleep(1);
+                for (int i = 0; i < 5; i++) {
+                    player.play("snore.wav");
+                    TimeUnit.SECONDS.sleep(3);
+                }
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
